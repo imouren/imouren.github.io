@@ -1,2 +1,2 @@
 
-my blog
+blog.enjoygames.cn
