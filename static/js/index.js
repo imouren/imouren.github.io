@@ -143,5 +143,5 @@ function generateContent() {
             'data-offset': '50'
         });*/
     }
-    console.log("myAffix!!!");
+    console.log("mail:mouren11@163.com");
 }

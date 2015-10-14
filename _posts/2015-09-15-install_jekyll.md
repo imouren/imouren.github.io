@@ -6,6 +6,8 @@ categories: jekyll
 tags: centos jekyll
 ---
 
+* content
+{:toc}
 
 ### 更新ruby
 {% highlight bash %}

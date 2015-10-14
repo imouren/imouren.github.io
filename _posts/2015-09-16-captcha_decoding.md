@@ -6,6 +6,8 @@ categories: python
 tags: python captcha
 ---
 
+* content
+{:toc}
 
 具体参考 [decoding-captchas]
 
