@@ -73,3 +73,13 @@ jekyll serve -H 0.0.0.0 -P 4000 --force_polling # 自动监控变化rebuild
 * `_drafts`  未发布文章放这
 * `_posts`  发布文章放这
 * `_site`  转换好的页面
+
+
+### 使用主题
+
+去这个[网站]找吧
+
+现在使用的这个[主题]
+
+[网站]: http://jekyllthemes.org/
+[主题]: http://jekyllthemes.org/themes/cool-concise-high-end/
