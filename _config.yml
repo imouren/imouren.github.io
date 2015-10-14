@@ -2,15 +2,18 @@
 title: 蛇小狼
 email: mouren11@163.com
 description: > # this means to ignore newlines until "baseurl:"
-    优雅的编码，诗意滴生活。<br/>
-    精神自由，财富自由。
+    优雅的编码，诗意的生活
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://blog.enjoygames.cn" # the base hostname & protocol for your site
 github_username: imouren
 twitter_username: imouren
 logo: "favicon.ico"
 # paginate
-paginate: 5
-paginate_path: "/blog/page:num/"
+paginate: 10
+paginate_path: "page:num"
+
+permalink: /:year/:month/:day/:title/
 # Build settings
 markdown: kramdown
+
+highlighter: pygments

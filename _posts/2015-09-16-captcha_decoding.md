@@ -9,7 +9,9 @@ tags: python captcha
 
 具体参考 [decoding-captchas]
 
-文件下载 [captcha.zip] python文件[crackit.py]
+文件下载 [captcha.zip]
+
+python文件 [crackit.py]
 
 ### 读取图片
 {% highlight python %}
