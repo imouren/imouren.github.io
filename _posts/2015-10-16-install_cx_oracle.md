@@ -49,4 +49,14 @@ source /etc/profile
 pip install cx_oracle
 {% endhighlight %}
 
+### 连接错误
+
+"ORA-21561: OID generation failed"
+
+解决方法：
+配置客户端的hosts
+{% highlight python %}
+127.0.0.1 vagrant-centos65.vagrantup.com # 通过 hostname 命令获得
+{% endhighlight %}
+
 [官方网站]: http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
