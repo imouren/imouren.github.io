@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "安装cx_orcle"
+title:  "安装cx_oracle"
 date:   2015-10-16 15:05:31
 categories: python
 tags: python
