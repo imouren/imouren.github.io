@@ -40,6 +40,7 @@ vim /etc/profile
 export ORACLE_HOME=/opt/instantclient_12_1
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME
 export PATH=$ORACLE_HOME:$PATH
+export NLS_LANG=AMERICAN_AMERICA.AL32UTF8
 #生效
 source /etc/profile
 {% endhighlight %}
