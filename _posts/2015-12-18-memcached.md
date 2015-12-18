@@ -524,7 +524,7 @@ END
 
 增加虚拟节点，使得压力分配均匀
 
-python的实现参考hash_ring
+python的实现参考[hash_ring](https://github.com/Doist/hash_ring)
 
 ## 6，memcached 应用与问题
 
