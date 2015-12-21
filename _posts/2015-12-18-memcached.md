@@ -398,7 +398,7 @@ END
 ### 数据项统计 stats items
 {% highlight python %}
 stats items
-STAT items:1:number 3  # 该slab 中对象数，不含过期对象
+STAT items:1:number 3  # 该slab 中对象数，含过期对象
 STAT items:1:age 1573203
 STAT items:1:evicted 0
 STAT items:1:evicted_nonzero 0
@@ -623,8 +623,9 @@ Mutex主要用于有大量并发访问并存在cache过期的场合，如
 然后再从数据库加载数据并设置到cache中
 
 
-## memcached 监控
+## memcached 监控和工具
 
 * 主要自己使用命令行看
 * [memcached-admin](https://github.com/ianare/django-memcache-admin)
 * memcahced perl管理工具 memcached-tool
+* 管理工具 [memcached-tool](http://libmemcached.org/libMemcached.html)
