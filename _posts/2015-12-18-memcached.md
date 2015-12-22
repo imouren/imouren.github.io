@@ -13,6 +13,12 @@ tags: memcached
 Free & open source, high-performance, distributed memory object caching system
 自由、开源、高性能、分布式内存对象缓存系统
 
+key-value 存储结构，可以根据key，按照一定hash算法，得出内存所在位置，进行存储。
+
+同样，获取的时候，也根据key就可以得到内存位置，获得高效访问。
+
+hash函数要求高效、碰撞率低。可以使用[murmurhash](https://en.wikipedia.org/wiki/MurmurHash)，python实现的有[mmhash](https://pypi.python.org/pypi/mmhash)
+
 ## 1，memcached 安装
 
 ### 安装编译工具
