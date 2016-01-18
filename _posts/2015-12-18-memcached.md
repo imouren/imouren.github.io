@@ -317,9 +317,13 @@ DELETED
 ### 其他命令
 
 version 查看版本
+
 quit 退出
-echo command args |nc ip host # 快捷方式直接发送命令
+
+echo command args |nc ip port # 快捷方式直接发送命令
+
 flush_all [delay] # 立即或者指定时间后失效所有的元素，但并没有清空内存空间
+
 flush_all 效果是导致所有更新时间早于 flush_all 所设定时间的项目，在被执行取回命令时命令被忽略
 
 
