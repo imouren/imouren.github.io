@@ -320,7 +320,7 @@ version 查看版本
 
 quit 退出
 
-echo command args |nc ip port # 快捷方式直接发送命令
+`echo command args |nc ip port` # 快捷方式直接发送命令
 
 flush_all [delay] # 立即或者指定时间后失效所有的元素，但并没有清空内存空间
 
