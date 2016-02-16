@@ -16,7 +16,7 @@ KNN 可以完成很多分类任务，但它的最大缺点是无法给出数据�
 
 下面的过滤邮件流程图就可以做为一个决策树：
 
-![决策树](http://chuantu.biz/t2/20/1448430086x-1566638320.png)
+![决策树](/files/decision_tree.png)
 
 
 ## 1. 决策树的构造
@@ -325,7 +325,7 @@ def retrieveTree(i):
 
 调用`treePlotter.createPlot(myTree)` 看下我们画出的决策树：
 
-![mytree.png](http://chuantu.biz/t2/20/1448453097x-1566638320.png)
+![mytree.png](/files/mytree.png)
 
 
 ## 测试和存储分类器
@@ -411,7 +411,7 @@ Out[104]:
 
 In [105]: treePlotter.createPlot(lensesTree)
 {% endhighlight %}
-![tree_test.png](http://chuantu.biz/t2/20/1448502339x-1566638323.png)
+![tree_test.png](/files/tree_test.png)
 
 
 

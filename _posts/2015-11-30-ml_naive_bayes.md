@@ -35,11 +35,11 @@ tags: python
 
 我们使用p(gray)表示取得灰色石头的概率，灰色石头数目除以所有石头数目
 
-![bayes1.png](http://chuantu.biz/t2/20/1448862238x-1566638323.png)
+![bayes1.png](/files/bayes1.png)
 
 如果将7块石头放到两个桶中，如图，那么概率应该如何计算呢？
 
-![bayes2.png](http://chuantu.biz/t2/20/1448862288x-954499005.png)
+![bayes2.png](/files/bayes2.png)
 
 
 
@@ -186,7 +186,7 @@ def trainNB0(trainMatrix,trainCategory):
 
 给出f(x) 和 ln(f(x)) 的曲线，他们在相同的区域内同时增加或者减少，并且在相同点上取到极值。虽然最终取值不同，但不影响最终结果。
 
-![bayes3.png](http://chuantu.biz/t2/20/1448867954x-1566638323.png)
+![bayes3.png](/files/bayes3.png)
 
 修改后代码：
 {% highlight python %}
