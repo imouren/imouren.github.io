@@ -2,8 +2,8 @@
 layout: post
 title:  "内容推荐算法简单应用"
 date:   2016-02-22 14:05:31
-categories: memcached
-tags: memcached
+categories: 推荐 python
+tags: 推荐 python
 ---
 
 * content
