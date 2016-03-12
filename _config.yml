@@ -9,6 +9,7 @@ github_username: imouren
 twitter_username: imouren
 logo: "favicon.ico"
 # paginate
+gems: [jekyll-paginate]
 paginate: 10
 paginate_path: "page:num"
 
@@ -16,4 +17,4 @@ permalink: /:year/:month/:day/:title/
 # Build settings
 markdown: kramdown
 
-highlighter: pygments
+highlighter: rouge
