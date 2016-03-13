@@ -14,10 +14,12 @@ tags: hadoop
 ### 环境设置
 
 设置虚拟机
-:   选择桥接方式，方便与其他主机通信
+
+选择桥接方式，方便与其他主机通信
 
 给hadoop用户开放sudo 权限：
-:   `su`切换到root权限，修改 `/etc/sudoers`增加`hadoop ALL=(ALL) ALL` 同root配置一样
+
+`su`切换到root权限，修改 `/etc/sudoers`增加`hadoop ALL=(ALL) ALL` 同root配置一样
 
 修改为无界面模式，节约内存
 {% highlight python %}
