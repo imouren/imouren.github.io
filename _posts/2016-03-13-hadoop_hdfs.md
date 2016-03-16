@@ -138,5 +138,207 @@ total 139M
 {% endhighlight %}
 
 
+## RPC机制
 
+Hadoop的进程间交互都是通过RPC来进行的，比如Namenode与Datanode之间，Jobtracker与Tasktracker之间等。
 
+Hadoop的RPC主要是通过Java的动态代理（Dynamic Proxy）与反射（Reflect）实现，
+
+代理类是由java.lang.reflect.Proxy类在运行期时根据接口，采用Java反射功能动态生成的，
+
+并且结合java.lang.reflect.InvocationHandler来处理客户端的请求，
+
+当用户调用这个动态生成的实现类时，实际上是调用了InvocationHandler实现类的invoke方法。
+
+RPC源代码在org.apache.hadoop.ipc下，有以下几个主要类：
+
+* Client: 客户端，连接服务器、传递函数名和相应的参数、等待结果；
+* Server:服务器端，主要接受Client的请求、执行相应的函数、返回结果；
+* VersionedProtocol:通信双方所遵循契约的父接口；
+* RPC：RPC通信机制，主要是为通信的服务方提供代理。
+
+## 文件系统
+
+hadoop 有一个抽象的文件系统概念，HDFS只是其中一个实现。
+
+文件系统抽象类是 `org.apache.hadoop.fs.FileSystem`
+
+列出本地文件
+
+```python
+[hadoop@localhost ~]$ hadoop fs -ls file:///home/hadoop
+Found 13 items
+-rw-rw-r--   1 hadoop hadoop          0 2016-03-16 10:32 file:///home/hadoop/.audit.log
+-rw-------   1 hadoop hadoop      73234 2016-03-15 17:50 file:///home/hadoop/.bash_history
+-rw-r--r--   1 hadoop hadoop         18 2011-12-02 22:27 file:///home/hadoop/.bash_logout
+-rw-r--r--   1 hadoop hadoop        230 2016-03-07 18:38 file:///home/hadoop/.bash_profile
+-rw-r--r--   1 hadoop hadoop        124 2011-12-02 22:27 file:///home/hadoop/.bashrc
+drwxr-xr-x   - hadoop admin        4096 2016-03-15 17:49 file:///home/hadoop/.ipython
+drwx------   - hadoop hadoop       4096 2016-03-03 18:02 file:///home/hadoop/.ssh
+-rw-------   1 hadoop admin        8678 2016-03-15 17:48 file:///home/hadoop/.viminfo
+drwxr-xr-x   - hadoop hadoop       4096 2016-03-03 13:58 file:///home/hadoop/XosRS
+-rw-r--r--   1 hadoop hadoop  134085611 2016-03-03 15:26 file:///home/hadoop/hadoopclientback.tar.gz
+-rw-r--r--   1 hadoop admin   168414010 2016-03-03 16:08 file:///home/hadoop/jdk.tar.gz
+drwxr-xr-x   - hadoop admin        4096 2016-03-10 16:22 file:///home/hadoop/test
+drwxr-xr-x   - hadoop root         4096 2016-03-12 15:13 file:///home/hadoop/tmp
+```
+
+如果只是操作hdfs，可以用 `hdfs dfs`命令， 查看帮助 `hdfs dfs -usage`
+
+## python 操作 HDFS
+
+要用到第三方包`Snakebite`，直接`pip install snakebite`安装即可
+
+### 程序客户端
+
+主要有几个客户端：
+
+```python
+
+# HDFS客户端
+class snakebite.client.Client(host, port=8020, hadoop_version=9, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None)
+
+# HDFS客户端，支持HA并自动读取 HADOOP_HOME 环境变量的配置
+# 会读取 ${HADOOP_HOME}/conf/hdfs-site.xml 和 ${HADOOP_HOME}/conf/core-site.xml  获得namenode的地址
+class snakebite.client. AutoConfigClient(hadoop_version=9, effective_user=None, use_sasl=False)
+
+# HA客户端
+class snakebite.client. HAClient(namenodes, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None)
+
+```
+
+列出某个目录
+
+```python
+from snakebite.client import Client
+
+client = Client('192.168.xx.xx', 8020)
+for x in client.ls(['/test']):
+    print x
+
+# 结果
+{'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1457517232441L, 'length': 0L, 'blocksize': 0L, 'owner': u'hadoop', 'path': '/test/input'}
+{'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1457490623664L, 'length': 0L, 'blocksize': 0L, 'owner': u'hadoop', 'path': '/test/ip_counter_top'}
+```
+
+创建目录
+
+```python
+from snakebite.client import Client
+
+client = Client('192.168.xx.xx', 8020)
+for p in client.mkdir(['/foo/bar' , '/test/bar' ], create_parent=True):
+   print p
+
+# 结果
+{'path': '/foo/bar', 'result': True}
+{'path': '/test/bar', 'result': True}
+
+```
+
+删除目录
+
+```python
+from snakebite.client import Client
+
+client = Client('192.168.xx.xx', 8020)
+for p in client.delete(['/foo/bar' , '/test/bar' ], recurse=True):
+   print p
+
+# 结果
+{'path': '/foo/bar', 'result': True}
+{'path': '/test/bar', 'result': True}
+
+# 注意 recurse=True 相当于 rm -rf 的参数 谨慎使用
+```
+
+使用自动读取配置的客户端
+
+```python
+from snakebite.client import AutoConfigClient
+client = AutoConfigClient()
+for x in client.ls(['/test']):
+    print x
+
+```
+
+使用HA客户端
+
+```python
+from snakebite.client import HAClient
+from snakebite.namenode import Namenode
+n1 = Namenode("funshion-hadoop70", 8020)
+n2 = Namenode("funshion-hadoop71", 8020)
+client = HAClient([n1, n2], use_trash=True)
+for x in client.ls(['/test']):
+    print x
+
+```
+
+###  snakebite 命令行客户端
+
+snakebite 的命令行，是纯python实现的，不需要读取很多java包，比`hdfs dfs`命令行要快
+
+配置的读取顺序：
+
+* 直接指定hdfs地址 `snakebite ls hdfs://funshion-hadoop71:8020/test/`
+* 通过 -n, -p, -V 参数指定
+* 通过 `~/.snakebiterc` 用户配置文件
+* 通过 `/etc/snakebiterc` 全部用户配置文件
+* 通过 `$HADOOP_HOME/core-site.xml` and/or `$HADOOP_HOME/hdfs-site.xml`
+* 通过 本地的 `core-site.xml` and/or `hdfs-site.xml` in default locations
+
+配置文件格式：
+
+```python
+{
+    "config_version": 2,
+    "skiptrash": true,
+    "namenodes": [
+        { "host": "mynamenode1", "port": 8020, "version": 9},
+        { "host": "mynamenode2", "port": 8020, "version": 9}
+    ]
+}
+
+```
+
+查看帮助
+
+```python
+[hadoop@localhost hadoop]$ /usr/local/python27/bin/snakebite --help
+snakebite [general options] cmd [arguments]
+general options:
+  -D --debug                     Show debug information
+  -V --version                   Hadoop protocol version (default:9)
+  -h --help                      show help
+  -j --json                      JSON output
+  -n --namenode                  namenode host
+  -p --port                      namenode RPC port (default: 8020)
+  -v --ver                       Display snakebite version
+
+commands:
+  cat [paths]                    copy source paths to stdout
+  chgrp <grp> [paths]            change group
+  chmod <mode> [paths]           change file mode (octal)
+  chown <owner:grp> [paths]      change owner
+  copyToLocal [paths] dst        copy paths to local file system destination
+  count [paths]                  display stats for paths
+  df                             display fs stats
+  du [paths]                     display disk usage statistics
+  get file dst                   copy files to local file system destination
+  getmerge dir dst               concatenates files in source dir into destination local file
+  ls [paths]                     list a path
+  mkdir [paths]                  create directories
+  mkdirp [paths]                 create directories and their parents
+  mv [paths] dst                 move paths to destination
+  rm [paths]                     remove paths
+  rmdir [dirs]                   delete a directory
+  serverdefaults                 show server information
+  setrep <rep> [paths]           set replication factor
+  stat [paths]                   stat information
+  tail path                      display last kilobyte of the file to stdout
+  test path                      test a path
+  text path [paths]              output file in text format
+  touchz [paths]                 creates a file of zero length
+  usage <cmd>                    show cmd usage
+```

@@ -97,8 +97,6 @@ jekyll serve -H 0.0.0.0 -P 4000 --force_polling # 自动监控变化rebuild
 { % endhighlight % }
 ```
 
-
-
 可以在配置文件中增加如下配置，可以方便使用markdown自带的高亮方式
 
 ```python
@@ -106,3 +104,16 @@ markdown: kramdown
 kramdown:
     input:         GFM
 ```
+
+### 内部链接
+
+文章链接是由jekyll生成的，所以无法获知博客文章的相对路径
+
+可以这样写，去掉`{` 和 `%` 空格， 不要加`.md`后缀
+
+```python
+{ % post_url blog_fil_name % }
+```
+
+例如：前往[python操作IP代码]({% post_url 2015-09-02-python_ip_code %})
+
