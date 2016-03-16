@@ -85,3 +85,24 @@ jekyll serve -H 0.0.0.0 -P 4000 --force_polling # 自动监控变化rebuild
 
 [网站]: http://jekyllthemes.org/
 [主题]: http://jekyllthemes.org/themes/cool-concise-high-end/
+
+
+### 语法高亮
+
+默认使用如下，去掉`{` 和 `%` 空格
+
+```python
+{ % highlight bash % }
+    your code
+{ % endhighlight % }
+```
+
+
+
+可以在配置文件中增加如下配置，可以方便使用markdown自带的高亮方式
+
+```python
+markdown: kramdown
+kramdown:
+    input:         GFM
+```

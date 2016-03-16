@@ -16,5 +16,9 @@ paginate_path: "page:num"
 permalink: /:year/:month/:day/:title/
 # Build settings
 markdown: kramdown
+# can use ```python
+kramdown:
+    input:         GFM
+
 
 highlighter: rouge
