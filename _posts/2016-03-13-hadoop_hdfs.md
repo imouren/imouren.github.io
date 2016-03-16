@@ -56,6 +56,8 @@ edits log 合并到 fsimage的时候，需要secondary namenode
 6. SN 将新的镜像上传给NN
 7. NN 用新的fsimage 替换旧的 fsimage，重命名 edits.new 为 edits
 
+![hadoop_namenode](/files/hadoop_namenode.png)
+
 namenode 的主要职责：
 
 * 维护元数据信息
