@@ -32,7 +32,7 @@ cx_Oracle 的运行需要环境变量，本身已经配置到 /etc/profile 中
 
 source /etc/profile
 
-source ~/bash_profile
+source ~/.bash_profile
 
 ```
 
