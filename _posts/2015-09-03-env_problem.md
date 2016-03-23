@@ -2,8 +2,8 @@
 layout: post
 title:  "centos 依赖"
 date:   2015-09-02 15:05:31
-categories:  centos
-tags:  centos
+categories:  linux
+tags:  linux
 ---
 
 * content
@@ -42,5 +42,10 @@ yum install bzip2-devel zlib zlib-devel
 # 重新编译python
 ```
 
+也可以这样
+
+```python
+cp /usr/lib64/python2.6/lib-dynload/bz2.so ../../../env/lib/python2.7/
+```
 
 
