@@ -317,5 +317,8 @@ start-yarn.sh  # 两个都没有要求输入密码
 * 结果一致 B 发送给A 指令，通过验证
 
 
+### 三步配置免密钥登陆
 
-
+1. `ssh-keygen -t rsa` 默认回车继续到底
+2. `ssh-copy-id -i ~/.ssh/id_rsa.pub user@remote-host`
+3. `ssh user@remote-host`
