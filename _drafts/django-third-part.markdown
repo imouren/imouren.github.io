@@ -20,5 +20,8 @@ categories: django
 * redisboard
 * raven
 * hash_ring
-
+* snakebite
+* mrjob
+* jieba
+* cx_Oracle
 
