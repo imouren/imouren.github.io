@@ -28,9 +28,37 @@ arp-scan -I eth1 -l  # 使用工具
 ```
 
 
+## 查看CPU核数
+
+查看物理CPU的个数
+
+```python
+cat /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l
+```
+查看逻辑CPU的个数
+
+```python
+cat /proc/cpuinfo |grep "processor"|wc -l
+```
+
+查看CPU是几核
+
+```python
+cat /proc/cpuinfo |grep "cores"|uniq
+```
+
+查看CPU的主频
+
+```python
+cat /proc/cpuinfo |grep MHz|uniq
+```
 
 
+## 去掉windows换行
 
+```python
+sed -i "s/\r//" test.sh
+```
 
 
 
