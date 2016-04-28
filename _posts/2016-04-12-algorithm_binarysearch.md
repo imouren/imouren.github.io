@@ -35,3 +35,16 @@ for i in L:
 print binary_search(L, 10)
 
 ```
+
+python 标准库提供了bisect模块，可以很容易检测x是否在排序后的L中
+
+```python
+# cookbook
+import bisect
+
+L = range(100)
+x = -1
+x_insert_point = bisect.bisect_right(L, x)
+x_is_present = L and L[x_insert_point-1] == x
+
+```
