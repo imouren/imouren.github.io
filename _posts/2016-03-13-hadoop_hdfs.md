@@ -277,6 +277,28 @@ for x in client.ls(['/test']):
 
 ```
 
+关于上传文件
+
+snakebite 没有实现`put()`或者`copyFromLocal()`函数
+
+这里使用另外一种方式来实现。脚本运行机器要有hadoop客户端
+
+```python
+
+path = "/product/baidu/result.json"
+# 删除结果路径
+if client.test(path, exists=True):
+    list(client.delete([path]))
+# 临时文件
+f = tempfile.NamedTemporaryFile(delete=False)
+json.dump(result, f)
+f.close()
+# 上传到hdfs snakebite 没有 put 方法
+subprocess.check_call(['hdfs', 'dfs', '-put', f.name, path], shell=False)
+os.unlink(f.name)
+
+```
+
 ###  snakebite 命令行客户端
 
 snakebite 的命令行，是纯python实现的，不需要读取很多java包，比`hdfs dfs`命令行要快
