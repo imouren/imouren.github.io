@@ -48,4 +48,30 @@ yum install bzip2-devel zlib zlib-devel
 cp /usr/lib64/python2.6/lib-dynload/bz2.so ../../../env/lib/python2.7/
 ```
 
+## lxml 安装问题
 
+安装报错问题
+
+```python
+
+系统的libxslt 和 libxml2 版本太低
+
+自己编译安装
+
+```
+
+site-packages/lxml/etree.so: undefined symbol: __xmlStructuredErrorContext
+
+```python
+
+仔细分析之后发现，还是因为动态库路径的问题，也就是说etree.so在引用libxml2.so时出错，找不到libxml2.so
+
+解决方法很简单，将libxml2.so的路径添加到库加载路径中即可
+
+vim /etc/ld.so.conf
+
+在ld.so.conf中添加 /usr/local/lib
+
+ldconfig
+
+```
