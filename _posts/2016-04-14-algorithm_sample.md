@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "取样"
-date:   2016-04-20 10:35:31
+date:   2016-04-14 10:35:31
 categories: 算法 编程珠玑
 tags: 算法 编程珠玑
 ---
