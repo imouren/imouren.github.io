@@ -59,6 +59,7 @@ cat /proc/cpuinfo |grep MHz|uniq
 ```python
 sed -i "s/\r//" test.sh
 ```
+
 ## 查看网络IO
 
 ```python
