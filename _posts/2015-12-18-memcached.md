@@ -322,6 +322,8 @@ quit 退出
 
 `echo command args |nc ip port` # 快捷方式直接发送命令
 
+`echo -e "set name 1 0 6\r\npython\r" |nc  127.0.0.1 11211` # set命令
+
 flush_all [delay] # 立即或者指定时间后失效所有的元素，但并没有清空内存空间
 
 flush_all 效果是导致所有更新时间早于 flush_all 所设定时间的项目，在被执行取回命令时命令被忽略
@@ -656,3 +658,55 @@ Mutex主要用于有大量并发访问并存在cache过期的场合，如
 * [memcached-admin](https://github.com/ianare/django-memcache-admin)
 * memcahced perl管理工具 memcached-tool
 * 管理工具 [memcached-tool](http://libmemcached.org/libMemcached.html)
+* 压力测试的时候，memcached 不能正常响应，有可能是防火墙把链接关掉了。
+
+## python 客户端
+
+## python-memcached
+
+python-memcached不会在每次get/set操作完成之后主动关闭连接，他是一种长连接，但他如果保证线程安全呢？
+
+一般我们是这样使用它：
+
+```python
+
+import memcache
+mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+```
+
+答案在于他很取巧的让Client类继承threading.local，也就是Client里面的每一个属性都是跟当前线程绑定。
+
+这样每个线程都只会看到本地的Client，变相的实现了连接池。
+
+这个池的大小取决于系统有多少个线程。
+
+## douban libmc
+
+Is libmc thread-safe ?
+
+libmc is a single-threaded memcached client. If you initialize a libmc client in one thread but reuse that in another thread, a Python Exception ThreadUnsafe will raise in Python
+
+## pylibmc
+
+libmemcached 最受欢迎的memcached的C语言版本的客户端的，高性能，线程安全。很多语言都有对这个版本的wrapper
+
+pylibmc是对libmemcached的wrapper
+
+pylibmc.Client is not threadsafe like python-memcached’s Client class (which is threadlocal).
+
+## django 封装的cache
+
+简单用的这个
+
+```python
+
+def get_mc_client(server):
+    client = get_cache('django.core.cache.backends.memcached.MemcachedCache', **{
+            'LOCATION': server, 'TIMEOUT': None, "KEY_FUNCTION": lambda x,y,z: x
+        })
+    client.get_multi = client.get_many
+    return client
+
+mclient1 = get_mc_client("192.168.xx.xx:11211")
+
+```
