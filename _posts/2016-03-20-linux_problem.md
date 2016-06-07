@@ -58,6 +58,8 @@ cat /proc/cpuinfo |grep MHz|uniq
 
 ```python
 sed -i "s/\r//" test.sh
+
+sed -i -e 's/\r$//' scriptname.sh
 ```
 
 ## 查看网络IO
