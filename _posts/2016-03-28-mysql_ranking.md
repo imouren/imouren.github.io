@@ -23,6 +23,16 @@ fv_video_category 表存储了 视频ID和视频分类的对应关系
 select count(*) from (select count(video_id) from fv_video_category group by video_id having count(video_id) > 0) as cnt ;
 ```
 
+## in 语句按照 in 的顺序排序
+
+```python
+
+SELECT id, name
+FROM mytable
+WHERE name IN ('B', 'A', 'D', 'E', 'C')
+ORDER BY FIELD(name, 'B', 'A', 'D', 'E', 'C')
+
+```
 
 
 
