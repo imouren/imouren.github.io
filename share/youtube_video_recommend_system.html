@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>YouTube视频推荐系统</title>
+    <link rel="stylesheet" href="../static/remark/css/default.css" media="screen">
+  </head>
+  <body>
+    <textarea id="source">
+
+class: middle, inverse, center
+
+```python
+__   __         _____      _          
+\ \ / /__  _   |_   _|   _| |__   ___ 
+ \ V / _ \| | | || || | | | '_ \ / _ \
+  | | (_) | |_| || || |_| | |_) |  __/
+  |_|\___/ \__,_||_| \__,_|_.__/ \___|
+                                      
+```
+
+# 视频推荐系统
+### 刘志超
+
+2016.06.14
+
+
+
+---
+class: middle, inverse, center
+### 无需求不产品，用户对视频的需求？
+
+---
+class:  middle, inverse
+
+### 用户的需求主要有三个方面：
+
+* 确知道自己要看哪个视频
+
+* 通过搜索来获取某些主题的视频
+
+* 也不知道看什么，纯粹逛逛，找找乐子
+
+--
+count: false
+
+### 推荐产品面向的就是第三种需求
+
+---
+class:  middle, inverse
+
+### 视频推荐面临的难点
+
+* 用户上传视频（第三方获取）的视频量很大
+
+* 视频一般不会有高质量的元数据（标题，描述等）
+
+* 视频时间很短，这样就有很多干扰数据，不能明确表达用户是否喜欢
+
+* 大部分视频的生命周期比较短，可能就只有几天
+
+---
+class:  middle, inverse
+
+### 推荐的目标
+
+* 正确性，匹配用户兴趣和目标视频的内容
+
+* 时效性，用户最近的网上活动，要反应到推荐结果中
+
+* 多样性，为了满足用户广泛的兴趣
+
+* 可解释性
+
+---
+class:  middle, inverse
+### 推荐算法思路
+
+* 确定输入数据 --- 舍弃元数据，使用用户的浏览行为数据
+
+* 计算视频关联关系
+
+* 生产推荐视频候选集
+
+* 排序
+
+
+---
+class: middle, inverse
+
+### 视频关联关系（核心）
+
+相似性定义为一起被观看的概率
+
+`$$ r(v_i, v_j) = \frac{c_{ij}}{f(v_i, v_j)} $$`
+
+时间夸度一般为24小时
+
+`\(r(v_i, v_j)\)` 为视频关联度
+
+`\(c_{ij}\)` 为 视频 `\(v_i\)` 和 `\(v_j\)` 共同出现次数
+
+`\(f(v_i, v_j)\)` 为归一化函数
+
+简单来说 `\( f(v_i, v_j) = c_i * c_j \)` 也可以为其他函数
+
+
+---
+class: middle, inverse
+
+### 生成推荐候选集
+
+S：用户显示表达感兴趣的视频集合
+
+`\(R_i\)`: video相关联/相似的视频集和
+
+为用户推荐的视频后续集合为：
+
+`$$ C_1(S) = \bigcup_{v_i \in\ S}R_i $$`
+
+`\(C_1\)` 做为结果集，多样性上会很欠缺
+
+
+---
+class: middle, inverse
+
+### 多样性保证
+
+可以把`\(C_1\)`作为种子，产生`\(C_2\)`，一次类推产生`\(C_n\)`
+
+
+`$$ C_n(S) = \bigcup_{v_i \in\ C_{n-1}}R_i $$`
+
+最终的结果，会与看过的视频求差集
+
+
+`$$ C_{final}(S) = (\bigcup_{i=0}^N{C_i}) \backslash S $$`
+
+---
+class: middle, inverse
+
+### 排序
+
+* 视频的质量 -- 播放、评分、分享、收藏等数据
+
+* 跟用户的贴合度 -- 用户对视频的评分，以及候选集合与种子的相似度
+
+* 多样性
+
+
+---
+class: middle, inverse
+
+### 效果评测
+
+以最多收看、最多收藏、最多评星的视频作为基准，用以与推荐视频作比较
+
+实验时间是21天，评判标准是点击率
+
+<img src="/files/youtube_recommend.png" width = "80%" height = "80%" alt="youtube_recommend" align=center />
+
+
+---
+class: middle, inverse
+
+### 算法的MR实现过程
+
+准备工作：求出单个视频出现的次数
+
+input：视频播放日志 用到 vid 字段
+
+mapper: vid, 1
+
+combiner: vid, sum(counts)
+
+reducer: vid, sum(counts)
+
+---
+class: middle, inverse
+### 算法的MR实现过程
+
+input：视频播放日志 用到 fudid, timestamp, vid 字段
+
+mapper1:  fudid, (timestamp, vid)
+
+reducer1: (vid_max, vid_min), 1
+
+reducer2: vid_i, (vid_j, score)
+
+score = sum(counts) / c_i * c_j  # c_i, c_j 从上一步的结果取值
+
+reducer3: vid, [(vid_1, score_1), ...., (vid_n, score_n)]
+
+---
+class: middle, inverse
+### 算法的 视频关联度 结果
+
+放在了HDFS的如下目录中，可以去验证
+
+/test/video_play/youtube/res/2016/06/13/
+
+---
+class: middle, inverse
+### 论文出处
+
+google搜索即可找到
+
+Video Suggestion and Discovery for YouTube: Taking
+Random Walks Through the View Graph (2008)
+
+The YouTube Video Recommendation System (2010) (本文论述是此篇)
+
+Up Next: Retrieval Methods for
+Large Scale Related Video Suggestion (2014)
+
+---
+class: middle, inverse, center
+
+```
+ _____ _   _    _    _   _ _  ______  
+|_   _| | | |  / \  | \ | | |/ / ___| 
+  | | | |_| | / _ \ |  \| | ' /\___ \ 
+  | | |  _  |/ ___ \| |\  | . \ ___) |
+  |_| |_| |_/_/   \_\_| \_|_|\_\____/ 
+                                      
+```
+
+
+
+    </textarea>
+    <script src="../static/remark/js/remark.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+        highlightStyle: 'monokai',
+        highlightLanguage: 'remark'
+      });
+    </script>
+    <!--mathjax
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ["\\(","\\)"]], processEscapes: true }, TeX: { equationNumbers: { autoNumber: "AMS" } }, messageStyle: "none"});
+    </script>
+    -->
+
+    <script src="https://www.zybuluo.com/static/editor/libs/mathJax.js"></script>
+    <!--mathjax source code is here: https://github.com/mathjax/MathJax.-->
+    <script src="https://www.zybuluo.com/static/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script type="text/javascript"> 
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+      MathJax.Hub.Queue(function() {
+          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
+              return(elem.SourceElement());
+          }).parent().addClass('has-jax');
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+
+  </body>
+</html>
