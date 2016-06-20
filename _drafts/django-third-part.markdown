@@ -24,4 +24,6 @@ categories: django
 * mrjob
 * jieba
 * cx_Oracle
-
+* python-cjson
+* mmhash
+* lxml
