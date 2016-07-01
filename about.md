@@ -4,8 +4,6 @@ title: 关于
 permalink: /about/
 ---
 
-todo list:
-
-* hadoop相关组件比较
-* 相似算法总结
-* item协同过滤应用
+share:
+[实践经验](/share/best_practice.html)
+[youtube推荐系统](/share/youtube_video_recommend_system.html)
