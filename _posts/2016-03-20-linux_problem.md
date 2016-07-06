@@ -9,6 +9,14 @@ tags: linux
 * content
 {:toc}
 
+## 打印字符画
+
+```python
+
+echo "Hi Reboot" | figlet
+
+```
+
 ## 如何查看IP是否冲突
 
 ```python
