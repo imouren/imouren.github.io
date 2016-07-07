@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>k-近邻算法</title>
+    <link rel="stylesheet" href="../static/remark/css/default.css" media="screen">
+  </head>
+  <body>
+    <textarea id="source">
+
+class: middle, inverse, center
+
+```python
+ _  __  _   _   _   _ 
+| |/ / | \ | | | \ | |
+| ' /  |  \| | |  \| |
+| . \  | |\  | | |\  |
+|_|\_\ |_| \_| |_| \_|
+                      
+```
+
+# 机器学习实战读书分享
+### 刘志超
+
+2016.07.06
+
+
+
+---
+class:  middle, inverse
+
+### k-近邻算法概述
+
+* 采用测量不同特征值之间的距离方法进行分类
+
+* 选择样本数据集中前K个最相似的数据
+
+* 最后选择k个最相似数据中出现次数最多的分类，作为新数据的分类
+
+---
+class:  middle, inverse
+
+根据电影的打斗镜头数，和接吻镜头数，来进行分类
+
+|电影|打斗镜头|接吻镜头|电影类型|
+|---|-------|---------|---------|
+|A|3|104|爱情片|
+|B|2|100|爱情片|
+|C|1|81|爱情片|
+|D|101|10|动作片|
+|E|99|5|动作片|
+|F|98|2|动作片|
+|?|18|90|未知类型|
+
+---
+class:  middle, inverse
+
+我们可以得到未知电影和其他电影的距离
+
+|电影名称|与未知电影距离|
+|----|----|
+|A|20.5|
+|B|18.7|
+|C|19.2|
+|D|115.3|
+|E|117.4|
+|F|118.9|
+
+假定K=3，取最近的三个电影 A,B,C，这三个电影全部是 爱情片
+
+所以判定未知电影也是爱情片
+
+---
+class: middle, inverse
+
+### 常用相似度计算方式
+
+* 欧式距离 a(x1,y1)与b(x2,y2)
+
+`$$ {\sqrt {(x_1 - x_2) ^2  + (y_1 - y_2)^2}} $$`
+
+* 余弦夹角
+
+`$$ cos(\theta) = \frac{x_1x_2+y_1y_2}{\sqrt{x_1^2+x_2^2}\sqrt{y_1^2+y_2^2}} $$`
+
+* jaccard 系数
+
+`$$ jaccard = \frac{A \bigcap B}{A \bigcup B} $$`
+
+
+---
+class: middle, inverse
+
+使用k近邻算法分类
+```python
+
+def classify0(inX, dataSet, labels, k):
+    dataSetSize = dataSet.shape[0]
+    # 计算距离
+    diffMat = tile(inX, (dataSetSize, 1)) - dataSet
+    sqDiffMat = diffMat**2
+    sqDistances = sqDiffMat.sum(axis=1)
+    distances = sqDistances**0.5
+    sortedDistIndicies = distances.argsort()
+    # 取K个距离最小的点
+    classCount = {}
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndicies[i]]
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
+    sortedClassCount = sorted(classCount.iteritems(),
+        key=operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
+```
+
+---
+class: middle, inverse
+
+### 归一化处理
+
+`$$ \sqrt {(0 - 67)^2 + (20000 - 32000)^2 + (1.1— 0.1)^2} $$`
+
+数值越大，对结果的影响越大
+
+* 线性函数转换
+
+`$$ Y = \left|\frac{X - X_{min}}{X_{max} - X_{min}}\right| $$`
+
+* 指数函数转换
+
+`$$ Y = \log_{10}X $$`
+
+---
+class: middle, inverse
+
+归一化数值的程序
+
+```python
+
+def autoNorm(dataSet):
+    minVals = dataSet.min(0)
+    maxVals = dataSet.max(0)
+    ranges = maxVals - minVals
+    normDataSet = zeros(shape(dataSet))
+    m = dataSet.shape[0]
+    normDataSet = dataSet - tile(minVals, (m,1))
+    normDataSet = normDataSet/tile(ranges, (m,1))   #element wise divide
+    return normDataSet, ranges, minVals
+```
+
+
+---
+class: middle, inverse, center
+
+```
+ _____ _   _    _    _   _ _  ______  
+|_   _| | | |  / \  | \ | | |/ / ___| 
+  | | | |_| | / _ \ |  \| | ' /\___ \ 
+  | | |  _  |/ ___ \| |\  | . \ ___) |
+  |_| |_| |_/_/   \_\_| \_|_|\_\____/ 
+                                      
+```
+[more](/2015/11/16/ml_knn/)
+
+
+
+    </textarea>
+    <script src="../static/remark/js/remark.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+        highlightStyle: 'monokai',
+        highlightLanguage: 'remark'
+      });
+    </script>
+    <!--mathjax
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ["\\(","\\)"]], processEscapes: true }, TeX: { equationNumbers: { autoNumber: "AMS" } }, messageStyle: "none"});
+    </script>
+    -->
+
+    <script src="https://www.zybuluo.com/static/editor/libs/mathJax.js"></script>
+    <!--mathjax source code is here: https://github.com/mathjax/MathJax.-->
+    <script src="https://www.zybuluo.com/static/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script type="text/javascript"> 
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+      MathJax.Hub.Queue(function() {
+          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
+              return(elem.SourceElement());
+          }).parent().addClass('has-jax');
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+
+  </body>
+</html>
