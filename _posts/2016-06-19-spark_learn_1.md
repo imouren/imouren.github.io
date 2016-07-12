@@ -36,10 +36,10 @@ from pyspark import SparkContext, SparkConf
   --executor-memory 8G \
   --executor-cores 4 \
   --driver-memory 1G \
-  --conf spark.default.parallelism=300 \
+  --conf spark.default.parallelism=500 \
   --conf spark.storage.memoryFraction=0.5 \
   --conf spark.shuffle.memoryFraction=0.5 \
-  icf3.py
+  icfx.py
 """
 
 os.environ["PYSPARK_PYTHON"]="/usr/local/Python-2.7.11/bin/python"
@@ -50,12 +50,12 @@ def json_output(kv):
 
 def _get_mid_count(line):
     y = line.split("\t")
-    if y[14].isdigit():
+    if y[14].isdigit() and int(y[14]) < 1000000:
         yield int(y[14]), 1
 
 def _get_fudid_mid(line):
     y = line.split("\t")
-    if y[14].isdigit():
+    if y[14].isdigit() and int(y[14]) < 1000000:
         yield y[11], int(y[14])
 
 def _get_mid_relate(mids):
@@ -78,45 +78,53 @@ def _get_mid_sim(pops, pairs):
         yield mid_j, (mid_i, sim)
 
 
-def _get_mids_set(pops, pairs):
+def _get_mids_set(pairs):
     fudid, mids = pairs
     res = []
     for mid in set(mids):
-        num = pops.get(mid, 0)
-        if 10 < num < 100000:
-            res.append(mid)
-    if len(res) > 2:
+        res.append(mid)
+    if 2 < len(res) < 50:
         yield res
-
-
 
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("mr_spark_icf")
     sc = SparkContext(conf=conf)
-    yesterday = datetime.now() - timedelta(1)
     base_path = "/dw/logs/format/app_fbuffer/{}/{:02}/{:02}/part*"
-    path = base_path.format(yesterday.year, yesterday.month, yesterday.day)
-    # path = "/dw/logs/format/app_fbuffer/2016/07/03/part-r-00000"
+    paths = []
+    yesterday = datetime.now() - timedelta(1)
+    for i in range(1, 8):
+        the_day = datetime.now() - timedelta(i)
+        apath = base_path.format(the_day.year, the_day.month, the_day.day)
+        paths.append(apath)
+    path = ",".join(paths)
+    #path = "/dw/logs/format/app_fbuffer/2016/07/03/part-r-00000"
     lines = sc.textFile(path).cache()
+
+    # log
+    log4jLogger = sc._jvm.org.apache.log4j
+    LOGGER = log4jLogger.LogManager.getLogger(__name__)
+    LOGGER.info("init log ...")
 
     # get mid pop dict
     mid_pop = lines.flatMap(_get_mid_count) \
                 .countByKey()
-    sc.broadcast(mid_pop)
+    pops = sc.broadcast(mid_pop)
+
+    LOGGER.info("mid_pop log ...")
 
     # fudid mid
     # fudid set(mids)
     pairs = lines.flatMap(_get_fudid_mid) \
                 .groupByKey() \
-                .flatMap(partial(_get_mids_set, mid_pop)) 
-                
+                .flatMap(_get_mids_set)
+    
     # (mid_i, mid_j) n
     pairs_counts = pairs.flatMap(_get_mid_relate) \
-                        .reduceByKey(add)
+                                .reduceByKey(add)
     # mid_i (mid_j, sim)
     # mid [(mid,sim), (mid, sim)]
-    mid_sims = pairs_counts.flatMap(partial(_get_mid_sim, mid_pop)) \
+    mid_sims = pairs_counts.flatMap(partial(_get_mid_sim, pops.value)) \
                             .groupByKey() \
                             .mapValues(lambda x: sorted(list(x), key=itemgetter(1), reverse=True)[:100])
 
@@ -126,6 +134,8 @@ if __name__ == "__main__":
     mid_sims.saveAsTextFile(output_path)
 
     sc.stop()
+
+
 
 
 ```
@@ -175,5 +185,27 @@ yarn application -kill application_1428487296152_25597
 >>> counts = words.flatMap(mapper).reduceByKey(lambda x, y: x + y)
 >>> counts.take(5)
 [(u'all', 1), (u'help', 1), (u'webpage', 1), (u'when', 1), (u'Hadoop', 12)]
+
+```
+
+如何读取多个输入文件？
+
+```python
+
+path1 = "/dw/logs/format/app_fbuffer/2016/07/03/part*"
+path2 = "/dw/logs/format/app_fbuffer/2016/07/03/part*"
+paths = [path1, path2]
+lines = sc.textFile(",".join(paths))
+
+```
+
+如何使用日志？
+
+```python
+
+# log
+log4jLogger = sc._jvm.org.apache.log4j
+LOGGER = log4jLogger.LogManager.getLogger(__name__)
+LOGGER.info("init log ...")
 
 ```
