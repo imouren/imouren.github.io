@@ -29,10 +29,54 @@ git config http.postBuffer 524288000
 ```
 
 
+## clone所有远程分支到本地
+
+```python
+克隆项目
+$ git clone git://example.com/myproject
+$ cd myproject
+
+查看分支
+$ git branch
+* master
+
+查看所有分支
+$ git branch -a
+* master
+  remotes/origin/HEAD
+  remotes/origin/master
+  remotes/origin/v1.0-stable
+  remotes/origin/experimental
+
+克隆远程分支
+$ git checkout origin/experimental
+克隆并切换到远程分支
+$ git checkout -b experimental origin/experimental
+```
+
+自动脚本
+
+```python
+
+#!/bin/bash
+for branch in `git branch -a | grep remotes | grep -v HEAD | grep -v master `; do
+   git branch --track ${branch#remotes/origin/} $branch
+   git checkout ${branch#remotes/origin/}
+done
+
+```
+
+或者
 
 
+```python
 
+#!/bin/bash
+for branch in `git branch -a | grep remotes | grep -v HEAD | grep -v master `; do
+   git checkout -b ${branch#remotes/origin/}
+done
 
+```
 
 
 
