@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "GIT 错误"
+title:  "GIT相关问题"
 date:   2016-04-05 09:05:31
 categories: git
 tags: git
