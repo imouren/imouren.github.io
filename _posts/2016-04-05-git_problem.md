@@ -28,6 +28,20 @@ linux:
 git config http.postBuffer 524288000
 ```
 
+## github 免密码
+
+修改使用ssh方式
+
+点击头像--> setttings --> SSH and GPG keys
+
+```python
+
+git remote rm origin
+
+git@github.com:yourname/yourname.github.io.git
+
+git push origin master
+```
 
 ## clone所有远程分支到本地
 
