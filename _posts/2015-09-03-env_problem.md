@@ -13,20 +13,25 @@ tags:  linux
 ## 常用的安装包
 
 ```python
-yum install openssl openssl-devel
-yum install sqlite-devel libffi-devel libxslt-devel
-yum install libjpeg-devel freetype-devel
+yum install openssl openssl-devel -y
+yum install sqlite-devel libffi-devel libxslt-devel -y
+yum install libjpeg-devel freetype-devel -y
 
-yum -y install cairo-devel libxml2-devel pango-devel pango libpng-devel freetype freetype-devel libart_lgpl-devel
+yum install cairo-devel libxml2-devel pango-devel pango libpng-devel freetype freetype-devel libart_lgpl-devel -y
 
-yum install ntp vim-enhanced gcc gcc-c++ gcc-g77 flex bison autoconf automake bzip2-devel ncurses-devel zlib-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel libXpm-devel gettext-devel  pam-devel
+yum install ntp vim-enhanced gcc gcc-c++ gcc-g77 flex bison autoconf automake bzip2-devel ncurses-devel zlib-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel libXpm-devel gettext-devel  pam-devel -y
 
 yum install -y rrdtool perl-rrdtool rrdtool-devel
 
-yum install glibc-static
+yum install glibc-static -y
 
 yum install gcc cmake make python-devel cairo-devel libxml2 libxml2-devel pango-devel pango libpng-devel freetype freetype-devel libart_lgpl-devel -y
 
+yum install bzip2-devel zlib zlib-devel -y
+
+yum install cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-md5 cyrus-sasl-plain -y
+
+yum install screen -y
 ```
 
 ## python 安装 readline错误
