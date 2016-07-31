@@ -42,3 +42,24 @@ source ~/.bash_profile
 0 * * * * . /etc/profile; /path/your.sh
 ```
 
+
+## 禁止crontab发邮件
+
+crontab执行成功总会发邮件，如果几分钟甚至几秒就执行一次，邮箱就会很大。
+
+可以重定向的方式禁止：
+
+```python
+
+00 3 * * *   bash  /home/xxx/bakup >/dev/null 2>&1
+```
+
+希望输出重定向到某个文件
+
+```python
+
+crontab -e
+
+MAILTO=""
+* * * * * /home/test/unison.sh >> /home/test/unison-run.log 2>&1
+```
