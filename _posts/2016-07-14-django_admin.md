@@ -98,14 +98,16 @@ class DefaultSearchWordsForm(forms.ModelForm):
 {% block sidebar %}
   {{ block.super }}
 
-  <div class="module" style="float: left; width: 498px">
+<div class="module" style="float: left; width: 498px">
     <table style="width: 100%">
-      <caption>Custom Links</caption>
-      <tbody>
-          <tr><td><a href="http://www.dmall.com" target="_blank">dmall</a></td></tr>
-      </tbody>
+        <caption>Custom Links</caption>
+        <tbody>
+            <tr>
+                <th scope="row"><a href="http://www.dmall.com" target="_blank">dmall</a></th>
+            </tr>
+        </tbody>
     </table>
-  </div>
+</div>
 {% endblock %}
 
 
