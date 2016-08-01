@@ -84,3 +84,36 @@ class DefaultSearchWordsForm(forms.ModelForm):
         return cleaned_data
 
 ```
+
+## 自定义admin的模板
+
+比如想在admin最后加上一个些其他网站的链接，方便访问
+
+```python
+
+# yourapp/templates/admin/index_custom.html
+
+{% extends "admin/index.html" %}
+
+{% block sidebar %}
+  {{ block.super }}
+
+  <div class="module" style="float: left; width: 498px">
+    <table style="width: 100%">
+      <caption>Custom Links</caption>
+      <tbody>
+          <tr><td><a href="http://www.dmall.com" target="_blank">dmall</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+
+# urls.py
+
+from django.contrib import admin
+
+admin.site.index_template = 'admin/index_custom.html'
+admin.autodiscover()
+
+```
