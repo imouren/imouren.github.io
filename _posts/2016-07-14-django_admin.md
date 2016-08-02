@@ -31,6 +31,36 @@ list_filter = ["channel__name", ]
 
 date_hierarchy = 'publication_date'
 
+## 替换 select 为 search
+
+https://docs.djangoproject.com/en/1.9/ref/contrib/admin/#django.contrib.admin.ModelAdmin.raw_id_fields
+
+raw_id_fields = ("merchant",)
+
+## 多选框
+
+```python
+
+@python_2_unicode_compatible
+class Shop(models.Model):
+    shop_id = models.IntegerField(u"门店ID", unique=True)
+    merchant = models.ForeignKey(Merchant, verbose_name=u"商户")
+    name = models.CharField(u"门店名称", max_length=128)
+
+
+@python_2_unicode_compatible
+class ShopGroup(models.Model):
+    shop_group_id = models.IntegerField(u"门店组ID", unique=True)
+    name = models.CharField(u"门店组名称", max_length=128)
+    shops = models.ManyToManyField(Shop, db_table='shop_group_ship')
+
+
+class ShopGroupAdmin(admin.ModelAdmin):
+    list_display = ["shop_group_id", "name"]
+    filter_horizontal = ('shops',)
+
+```
+
 ## 对app和model进行排序
 
 https://github.com/mishbahr/django-modeladmin-reorder
@@ -117,5 +147,35 @@ from django.contrib import admin
 
 admin.site.index_template = 'admin/index_custom.html'
 admin.autodiscover()
+
+```
+
+
+## manytomany 中间表自定义
+
+https://docs.djangoproject.com/en/dev/topics/db/models/#extra-fields-on-many-to-many-relationships
+
+```python
+
+from django.db import models
+
+class Person(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return self.name
+
+class Group(models.Model):
+    name = models.CharField(max_length=128)
+    members = models.ManyToManyField(Person, through='Membership')
+
+    def __str__(self):              # __unicode__ on Python 2
+        return self.name
+
+class Membership(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    date_joined = models.DateField()
+    invite_reason = models.CharField(max_length=64)
 
 ```
