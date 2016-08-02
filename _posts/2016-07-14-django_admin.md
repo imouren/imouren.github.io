@@ -9,6 +9,10 @@ tags: python django
 * content
 {:toc}
 
+## 去这个网站找
+
+https://djangosnippets.org/
+
 ## 编辑的时候按照指定field的属性
 
 fields = ["field2", "field1"]
@@ -58,6 +62,21 @@ class ShopGroup(models.Model):
 class ShopGroupAdmin(admin.ModelAdmin):
     list_display = ["shop_group_id", "name"]
     filter_horizontal = ('shops',)
+
+```
+
+## 多选框，不重复分组
+
+```python
+
+def formfield_for_manytomany(self, db_field, request, **kwargs):
+    if db_field.name == "shops":
+        path = request.get_full_path()
+        shop_group_pk = utils.r1("shopgroup/(\d+)/", path)
+        # 你希望用到的 这里采用 有分配组的其他 + 当前组的
+        kwargs["queryset"] = dbutils.get_nogroup_shops(shop_group_pk)
+    return super(ShopGroupAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
 
 ```
 
