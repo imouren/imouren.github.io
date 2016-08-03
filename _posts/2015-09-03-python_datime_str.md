@@ -38,3 +38,6 @@ def datetime_to_timestamp(adatetime):
 {% endhighlight %}
 
 
+判断 两个时间段区间 重合的条件
+
+start_timeA <= end_timeB and end_timeA >= start_timeB
