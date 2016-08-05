@@ -198,3 +198,36 @@ class Membership(models.Model):
     invite_reason = models.CharField(max_length=64)
 
 ```
+
+## 添加用户和权限
+
+```python
+
+CMS_PERMS = ["change_channel", "change_vender", "change_store",
+            "change_storegroup", "add_storegroup", "delete_storegroup",
+            "change_defaultsearchwords", "add_defaultsearchwords", "delete_defaultsearchwords",
+            "change_hotsearchwords", "add_hotsearchwords", "delete_hotsearchwords",
+            "change_positionpush", "add_positionpush", "delete_positionpush",
+            "change_categorypush", "add_categorypush", "delete_categorypush",
+            "change_blackskus", "add_blackskus", "delete_blackskus",
+            ]
+
+def add_custom_user():
+    # add user
+    try:
+        user = User.objects.get(username=settings.CMS_USER)
+    except:
+        user = None
+    if not user:
+        user = User.objects.create_user(settings.CMS_USER, settings.CMS_MAIL, settings.CMS_PASSWD)
+        user.is_active = True
+        user.is_staff = True
+        user.save()
+    # add permission
+    for perm in settings.CMS_PERMS:
+        if not user.has_perm("search_cms." + perm):
+            permission = Permission.objects.get(codename=perm)
+            user.user_permissions.add(permission)
+            get_object_or_404(User, pk=user.id)
+
+```
