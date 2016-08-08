@@ -185,8 +185,8 @@ class DefaultSearchWordsForm(forms.ModelForm):
             msg = u"无链接，且关键字物品少于%s个" % constants.SEARCH_WORD_GOODS_MIN
             raise forms.ValidationError(msg)
         return cleaned_data
-
 ```
+
 
 ## 自定义admin的模板
 
@@ -196,10 +196,10 @@ class DefaultSearchWordsForm(forms.ModelForm):
 
 # yourapp/templates/admin/index_custom.html
 
-{% extends "admin/index.html" %}
+{ % extends "admin/index.html" % }
 
-{% block sidebar %}
-  {{ block.super }}
+{ % block sidebar % }
+  { { block.super } }
 
 <div class="module" style="float: left; width: 498px">
     <table style="width: 100%">
@@ -211,7 +211,7 @@ class DefaultSearchWordsForm(forms.ModelForm):
         </tbody>
     </table>
 </div>
-{% endblock %}
+{ % endblock % }
 
 
 # urls.py
