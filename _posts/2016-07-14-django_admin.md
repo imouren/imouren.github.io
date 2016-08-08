@@ -35,6 +35,21 @@ list_filter = ["channel__name", ]
 
 date_hierarchy = 'publication_date'
 
+## 不显示修改按钮
+
+list_display_links = None
+
+## 不显示 删除 的action
+
+```python
+
+def get_actions(self, request):
+    actions = super(ChannelAdmin, self).get_actions(request)
+    del actions['delete_selected']
+    return actions
+
+```
+
 ## 替换 select 为 search
 
 https://docs.djangoproject.com/en/1.9/ref/contrib/admin/#django.contrib.admin.ModelAdmin.raw_id_fields
@@ -77,6 +92,45 @@ def formfield_for_manytomany(self, db_field, request, **kwargs):
         kwargs["queryset"] = dbutils.get_nogroup_shops(shop_group_pk)
     return super(ShopGroupAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
+
+```
+
+
+## 对super用户特殊处理
+
+```python
+
+def is_superuser(request):
+    if request.user.is_active and request.user.is_superuser:
+        return True
+    else:
+        return False
+
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ["store_id", "name", "vender"]
+    fields = list_display
+    list_filter = ["vender__name", ]
+    search_fields = ["name", ]
+    raw_id_fields = ("vender",)
+    readonly_fields = models.Store._meta.get_all_field_names()
+
+    def get_list_display_links(self, request, list_display):
+        list_display = super(ChannelAdmin, self).get_list_display_links(request, list_display)
+        if not is_superuser(request):
+            list_display = None
+        return list_display
+
+    def get_actions(self, request):
+        actions = super(StoreAdmin, self).get_actions(request)
+        if not is_superuser(request):
+            del actions['delete_selected']
+        return actions
+
+    def has_add_permission(self, request):
+        return is_superuser(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return is_superuser(request)
 
 ```
 
