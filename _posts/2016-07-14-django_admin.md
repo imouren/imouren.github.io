@@ -285,3 +285,43 @@ def add_custom_user():
             get_object_or_404(User, pk=user.id)
 
 ```
+
+
+## 在模板中使用settings的数据
+
+在你的app下面创建一个`context_processors.py` 文件
+
+```python
+
+# -*- coding: UTF-8 -*-
+from django.conf import settings
+
+
+def global_settings(request):
+    # return any necessary values
+    return {
+        'ERP_SITE': settings.ERP_SITE,
+    }
+
+```
+
+添加自定义的 context processor
+
+```python
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    ...
+    'app.context_processors.global_settings',
+)
+
+```
+
+在模板中使用数据
+
+```python
+
+<tr>
+    <th scope="row"><a href={{ ERP_SITE }} target="_blank">ERP</a></th>
+</tr>
+
+```
