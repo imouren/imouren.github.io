@@ -325,3 +325,18 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 </tr>
 
 ```
+
+## django admin 模板
+
+参考
+
+https://djangopackages.org/grids/g/admin-styling/
+
+列出前几个
+
+https://github.com/sehmaschine/django-grappelli
+
+https://github.com/django-admin-bootstrapped/django-admin-bootstrapped
+
+https://github.com/darklow/django-suit
+
