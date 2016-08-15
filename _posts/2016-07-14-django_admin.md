@@ -332,6 +332,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 https://djangopackages.org/grids/g/admin-styling/
 
+https://github.com/rosarior/awesome-django
+
 列出前几个
 
 https://github.com/sehmaschine/django-grappelli
@@ -339,4 +341,5 @@ https://github.com/sehmaschine/django-grappelli
 https://github.com/django-admin-bootstrapped/django-admin-bootstrapped
 
 https://github.com/darklow/django-suit
+
 
