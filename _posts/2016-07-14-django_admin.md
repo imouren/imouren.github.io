@@ -114,6 +114,12 @@ class StoreAdmin(admin.ModelAdmin):
     raw_id_fields = ("vender",)
     readonly_fields = models.Store._meta.get_all_field_names()
 
+    def get_readonly_fields(self, request, obj=None):
+        if is_superuser(request):
+            return []
+        else:
+            return super(StoreAdmin, self).get_readonly_fields(request, obj)
+
     def get_list_display_links(self, request, list_display):
         list_display = super(ChannelAdmin, self).get_list_display_links(request, list_display)
         if not is_superuser(request):
