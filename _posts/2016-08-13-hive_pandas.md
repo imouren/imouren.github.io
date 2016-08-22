@@ -2,8 +2,8 @@
 layout: post
 title:  "hive数据导入pandas"
 date:   2016-08-13 09:05:31
-categories: hive
-tags: hive
+categories: hive pandas
+tags: hive pandas
 ---
 
 * content
