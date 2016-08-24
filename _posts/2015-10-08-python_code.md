@@ -20,7 +20,7 @@ from numbers import Number
 def as_percent(v, precision='0.2'):
     """Convert number to percentage string."""
     if isinstance(v, Number):
-        return "{{:{}%}}".format(precision).format(v)
+        return "{ {:{}%} }".format(precision).format(v)
     else:
         raise TypeError("Numeric type required")
 
