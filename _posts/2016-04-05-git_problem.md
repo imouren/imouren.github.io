@@ -15,7 +15,7 @@ git checkout -b lzc  # 从当前分支创建新分支
 
 git push origin lzc  # 提交到远程
 
-git branch --set-upstream-to=origin/lzc  # 设置跟踪
+`git branch --set-upstream-to=origin/lzc`  # 设置跟踪
 
 ## 提交到远程报错
 

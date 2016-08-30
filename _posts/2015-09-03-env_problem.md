@@ -80,3 +80,10 @@ vim /etc/ld.so.conf
 ldconfig
 
 ```
+
+
+## contab
+
+yum install vixie-cron  crontabs -y
+
+service crond start
