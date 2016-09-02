@@ -332,6 +332,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 ```
 
+## 级联的实现
+
+django-smart-selects
+
+https://github.com/digi604/django-smart-selects
+
 ## django admin 模板
 
 参考
