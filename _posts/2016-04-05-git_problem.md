@@ -36,6 +36,17 @@ linux:
 git config http.postBuffer 524288000
 ```
 
+## 生成密钥（windows）
+
+查看密钥
+`ls -al ~/.ssh`
+
+生成密钥
+`ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`
+
+操作均使用 git bash 以及后续 git 指令操作
+
+
 ## github 免密码
 
 修改使用ssh方式
