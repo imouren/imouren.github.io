@@ -34,8 +34,14 @@ ORDER BY FIELD(name, 'B', 'A', 'D', 'E', 'C')
 
 ```
 
+## 聚合类和limit的结合使用
 
+```python
+# 得到全部数据的sum(disable)
+select sum(disable) from fv_video order by create_time desc limit 100000; 
 
+select sum(disable) from (select disable from fv_video order by create_time desc limit 100000) a;
+```
 
 
 

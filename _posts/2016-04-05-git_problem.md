@@ -112,7 +112,20 @@ done
 ```
 
 
+git 端口号修改
 
+```python
+
+# .git/config
+
+原来的
+url = git@code.funshion.com:japan/thor_crystal.git
+
+修改过的
+
+url = ssh://git@code.funshion.com:88888/japan/thor_crystal.git
+
+```
 
 
 

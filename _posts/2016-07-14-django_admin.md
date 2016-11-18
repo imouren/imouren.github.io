@@ -332,6 +332,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 ```
 
+## 不用many2many实现多选框
+
+https://github.com/kelvinwong-ca/django-select-multiple-field
+
 ## 级联的实现
 
 django-smart-selects
