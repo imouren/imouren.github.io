@@ -115,7 +115,11 @@ file 在此处不是关键字，是文件名。options 为命令行选项，sar�
 (18) 将输出到文件(-o)和读取记录信息(-f)
 ```
 
+## wget获取链接 & 后面参数无法获取
 
+可以将URL用双引号括起来
+
+wget "http://api-vmis.xxx.xx/list/?fudid=3d6118bc04c605c6e8c506c6e7ab70655f75d58452317c7d3ba70ec62129fb2d&v=1.0.0.0&app=1&pg=1&cl=TODO2&theme=0&uc=201&lt=first"
 
 
 
