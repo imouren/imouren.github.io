@@ -10,7 +10,7 @@ twitter_username: imouren
 logo: "favicon.ico"
 # paginate
 gems: [jekyll-paginate]
-paginate: 10
+paginate: 15
 paginate_path: "page:num"
 
 permalink: /:year/:month/:day/:title/
