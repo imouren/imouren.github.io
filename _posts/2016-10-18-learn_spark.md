@@ -403,3 +403,95 @@ In [127]: lines.map(lambda x: (x.split(" ")[0], x)).collect()
 Out[127]: [('hello', 'hello mr!'), ('hi', 'hi mouren')]
 
 ```
+
+### Pair RDD的转化操作
+
+Pair RDD 可以使用所有标准 RDD 上的可用的转化操作。
+
+一些转换操作举例：
+
+```python
+rdd = sc.parallelize([(1,2), (3, 4), (3, 6)])
+
+# 合并相同键的值
+In [4]: rdd.reduceByKey(lambda x, y: x+y).collect()
+Out[4]: [(1, 2), (3, 10)]
+
+# 对具有相同键的值进行分组
+In [8]: rdd.groupByKey().collect()
+Out[8]: 
+[(1, <pyspark.resultiterable.ResultIterable at 0x7f41b432ff50>),
+ (3, <pyspark.resultiterable.ResultIterable at 0x7f41b432fd50>)]
+
+In [9]: [(k, list(v)) for k, v in _]
+Out[9]: [(1, [2]), (3, [4, 6])]
+
+# 对 pair RDD 中的每个值应用一个函数而不改变键
+In [10]: rdd.mapValues(lambda x: x+1).collect()
+Out[10]: [(1, 3), (3, 5), (3, 7)]
+
+# 对 pair RDD 中的每个值应用一个返回迭代器的函数，然后对返回的每个元素都生成一个对应原键的键值对记录。
+In [12]: rdd.flatMapValues(lambda x: range(x)).collect()
+Out[12]: 
+[(1, 0),
+ (1, 1),
+ (3, 0),
+ (3, 1),
+ (3, 2),
+ (3, 3),
+ (3, 0),
+ (3, 1),
+ (3, 2),
+ (3, 3),
+ (3, 4),
+ (3, 5)]
+
+
+# keys values
+In [15]: rdd.keys().collect()
+Out[15]: [1, 3, 3]
+
+In [16]: rdd.values().collect()
+Out[16]: [2, 4, 6]
+
+# sortedByKey((ascending=True, numPartitions=None, keyfunc=)
+rdd.sortByKey(False).collect()
+```
+
+针对两个RDD的操作
+
+```python
+
+rdd = sc.parallelize([(1,2), (3, 4), (3, 6)])
+other = sc.parallelize([(3, 9)])
+
+# 删掉 RDD 中键与 other RDD 中的键相同的元素
+In [23]: rdd.subtractByKey(other).collect()
+Out[23]: [(1, 2)]
+
+# 对两个 RDD 进行内连接
+In [24]: rdd.join(other).collect()
+Out[24]: [(3, (4, 9)), (3, (6, 9))])
+
+# 左外连接 和 右外连接
+
+In [26]: rdd.rightOuterJoin(other).collect()
+Out[26]: [(3, (4, 9)), (3, (6, 9))]
+
+In [27]: rdd.leftOuterJoin(other).collect()
+Out[27]: [(1, (2, None)), (3, (4, 9)), (3, (6, 9))]
+
+# 将两个 RDD 中拥有相同键的数据分组到一起
+
+In [58]: rdd.cogroup(other).collect()
+Out[58]: 
+[(1,
+  (<pyspark.resultiterable.ResultIterable at 0x7f41b42d1110>,
+   <pyspark.resultiterable.ResultIterable at 0x7f41b42abc10>)),
+ (3,
+  (<pyspark.resultiterable.ResultIterable at 0x7f41b42abc90>,
+   <pyspark.resultiterable.ResultIterable at 0x7f41b42abcd0>))]
+
+{(1,([2],[])), (3,([4, 6],[9]))}
+
+```
