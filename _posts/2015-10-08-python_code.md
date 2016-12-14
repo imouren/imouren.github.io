@@ -111,3 +111,29 @@ if __name__ == "__main__":
     pool.wait_completion()
 
 ```
+
+## 自动获取文件编码读取文件内容
+
+EF BB BF是被称为 Byte order mark (BOM)的文件标记，用来指出这个文件是UTF-8编码
+
+```python
+
+import chardet
+import codecs
+
+bytes = min(32, os.path.getsize(filename))
+raw = open(filename, 'rb').read(bytes)
+
+if raw.startswith(codecs.BOM_UTF8):
+    encoding = 'utf-8-sig'
+else:
+    result = chardet.detect(raw)
+    encoding = result['encoding']
+
+infile = codecs.open(filename, mode, encoding=encoding)
+data = infile.read()
+infile.close()
+
+print(data)
+
+```

@@ -495,3 +495,152 @@ Out[58]:
 {(1,([2],[])), (3,([4, 6],[9]))}
 
 ```
+
+#### 聚合操作
+
+当数据集以键值对形式组织的时候，聚合具有相同键的元素进行一些统计是很常见的操作。
+
+```python
+# 使用 reduceByKey() 和 mapValues() 计算每个键对应的平均值
+In [4]: rdd = sc.parallelize([("panda", 0), ("pink", 3), ("pirate", 3), ("panda", 1), ("pink", 4)])
+
+In [5]: rdd.mapValues(lambda x: (x, 1)).reduceByKey(lambda x, y: (x[0]+y[0], x[1]+y[1])).collect()
+Out[5]: [('pink', (7, 2)), ('panda', (1, 2)), ('pirate', (3, 1))]
+
+```
+
+调用 reduceByKey() 和 foldByKey() 会在为每个键计算全局的总结之前先自动在每台机器上进行本地合并, 用户不需要指定合并器。
+
+更泛化的combineByKey() 接口可以让你自定义合并的行为。
+
+* combineByKey() 会遍历分区中的所有元素，因此每个元素的键要么还没有遇到过，要么就
+和之前的某个元素的键相同。
+
+* 如果这是一个新的元素， combineByKey() 会使用一个叫作 createCombiner() 的函数来创建那个键对应的累加器的初始值。需要注意的是，这一过程会在每个分区中第一次出现各个键时发生，而不是在整个 RDD 中第一次出现一个键时发生。
+
+* 如果这是一个在处理当前分区之前已经遇到的键，它会使用 mergeValue() 方法将该键的累
+加器对应的当前值与这个新的值进行合并。
+
+* 由于每个分区都是独立处理的，因此对于同一个键可以有多个累加器。如果有两个或者更多的分区都有对应同一个键的累加器，就需要使用用户提供的 mergeCombiners() 方法将各个分区的结果进行合并。
+
+```python
+In [7]: rdd.combineByKey(
+   ...:     lambda x: (x, 1),
+   ...:     lambda x, y: (x[0] + y, x[1] + 1),
+   ...:     lambda x, y: (x[0]+y[0], x[1]+y[1])
+   ...: ).collect()
+Out[7]: [('pink', (7, 2)), ('panda', (1, 2)), ('pirate', (3, 1))]
+```
+
+每个 RDD 都有固定数目的分区，分区数决定了在 RDD 上执行操作时的并行度。
+
+在执行聚合或分组操作时，可以要求 Spark 使用给定的分区数。
+
+```python
+
+In [8]: data = [("a", 3), ("b", 4), ("a", 1)]
+
+# 系统默认计算分区数
+In [9]: sc.parallelize(data).reduceByKey(lambda x, y: x+y).collect()
+Out[9]: [('a', 4), ('b', 4)]
+
+# 自己指定分区数
+In [10]: sc.parallelize(data).reduceByKey(lambda x, y: x+y, 10).collect()
+Out[10]: [('b', 4), ('a', 4)]
+
+```
+
+在除分组操作和聚合操作之外的操作中也能改变 RDD 的分区。对于这样的情况， Spark 提供了 repartition() 函数。
+
+它会把数据通过网络进行混洗，并创建出新的分区集合。切记，对数据进行重新分区是代价相对比较大的操作。 
+
+Spark 中也有一个优化版的repartition()，叫作 coalesce()。
+
+你可以使用 Python 中的 rdd.getNumPartitions 查看 RDD 的分区数，并确保调用 coalesce() 时将 RDD合并到比现在的分区数更少的分区中。
+
+```python
+In [14]: rdd.collect()
+Out[14]: [('panda', 0), ('pink', 3), ('pirate', 3), ('panda', 1), ('pink', 4)]
+
+In [15]: rdd.getNumPartitions()
+Out[15]: 4
+
+In [18]: rddx = rdd.coalesce(2)
+
+In [19]: rddx.getNumPartitions()
+Out[19]: 2
+
+```
+
+#### 数据分组
+
+groupByKey() 就会使用 RDD 中的键来对数据进行分组。对于一个由类型 K 的键和类型 V 的值组成的 RDD，所得到的结果 RDD 类型会是[K, Iterable[V]]
+
+如果你发现自己写出了先使用 groupByKey() 然后再对值使用 reduce() 或者fold() 的代码，
+你很有可能可以通过使用一种根据键进行聚合的函数来更高效地实现同样的效果
+
+对两个键的类型均为 K 而值的类型分别为 V 和 W 的 RDD 进行cogroup() 时，
+得到的结果 RDD 类型为 [(K, (Iterable[V], Iterable[W]))]
+
+
+### Pair RDD的行动操作
+
+```python
+In [32]: rdd = sc.parallelize([(1, 2), (3, 4), (3, 6)])
+
+# 对每个键对应的元素分别计数
+In [33]: rdd.countByKey()
+Out[33]: defaultdict(int, {1: 1, 3: 2})
+
+In [34]: rdd.collectAsMap()
+Out[34]: {1: 2, 3: 6}
+
+# 返回给定键对应的所有值
+In [35]: rdd.lookup(1)
+Out[35]: [2]
+
+In [36]: rdd.lookup(2)
+Out[36]: []
+
+In [37]: rdd.lookup(3)
+Out[37]: [4, 6]
+
+```
+
+### 数据分区
+
+分区并不是对所有应用都有好处的——比如，如果给定RDD 只需要被扫描一次，我们完全没有必要对其预先进行分区处理。
+
+只有当数据集多次在诸如连接这种基于键的操作中使用时，分区才会有帮助。
+
+```python
+
+In [43]: rdd.getNumPartitions()
+Out[43]: 4
+
+In [45]: rdd100=rdd.partitionBy(100)
+
+In [46]: rdd100.getNumPartitions()
+Out[46]: 100
+
+```
+
+Spark 的许多操作都引入了将数据根据键跨节点进行混洗的过程。所有这些操作都会从数据分区中获益。
+
+对于二元操作，输出数据的分区方式取决于父 RDD 的分区方式。 
+
+python 自定义分区
+
+```python
+import urlparse
+
+def hash_domain(url):
+    return hash(urlparse.urlparse(url).netloc)
+
+rdd.partitionBy(20, hash_domain) # 创建20个分区
+
+```
+
+## Spark编程进阶
+
+
