@@ -61,6 +61,16 @@ cat /proc/cpuinfo |grep "cores"|uniq
 cat /proc/cpuinfo |grep MHz|uniq
 ```
 
+## 查看centos版本
+
+```python
+cat  /etc/redhat-release
+
+# 查看内核版本
+uname  -r
+```
+
+
 
 ## 去掉windows换行
 
