@@ -643,4 +643,201 @@ rdd.partitionBy(20, hash_domain) # 创建20个分区
 
 ## Spark编程进阶
 
+两种类型的共享变量：
+
+* 累加器 (accumulator)
+
+* 广播变量 (broadcast variable)
+
+### 累加器
+
+累加器，提供了将工作节点中的值聚合到驱动器程序中的简单语法，常见用途是在调试时对作业执行过程中的事件进行计数。
+
+#### 用法
+
+1. 通过在驱动器中调用 SparkContext.accumulator(initialValue) 方法，创建出存有初始值的累加器。
+
+2. Spark 闭包里的执行器代码可以使用累加器的 += 方法增加累加器的值。
+
+3. 驱动器程序可以调用累加器的 value 属性来访问累加器的值。
+
+工作节点上的任务不能访问累加器的值。从这些任务的角度来看，累加器是一个只写变量。
+
+```python
+file = sc.textFile(inputFile)
+# 创建Accumulator[Int]并初始化为0
+blankLines = sc.accumulator(0)
+
+def extractCallSigns(line):
+    global blankLines # 访问全局变量
+    if (line == ""):
+    blankLines += 1
+    return line.split(" ")
+
+callSigns = file.flatMap(extractCallSigns)
+callSigns.saveAsTextFile(outputDir + "/callsigns")
+
+print "Blank lines: %d" % blankLines.value
+```
+
+#### 累加器的容错
+
+Spark 会自动重新执行失败的或较慢的任务来应对有错误的或者比较慢的机器，因此最终结果就是同一个函数可能对同一个数据运行了多次。
+
+对于要在行动操作中使用的累加器， Spark只会把每个任务对各累加器的修改应用一次。
+
+因此，如果想要一个无论在失败还是重复计算时都绝对可靠的累加器，我们必须把它放在 foreach() 这样的行动操作中
+
+在转化操作中，无法保证，累加器通常只用于调试目的。
+
+
+### 广播变量
+
+广播变量，可以让程序高效地向所有工作节点发送一个较大的只读值，以供一个或多个 Spark 操作使用。
+
+Spark 会自动把闭包中所有引用到的变量发送到工作节点上。虽然这很方便，但也很低效。
+
+原因有二：首先，默认的任务发射机制是专门为小任务进行优化的；其次，事实上你可能会在多个并行操作中使用同一个变量，但是 Spark 会为每个操作分别发送。
+
+广播变量使用：
+
+(1) 通过对一个类型 T 的对象调用 SparkContext.broadcast 创建出一个 Broadcast[T] 对象。任何可序列化的类型都可以这么实现。
+(2) 通过 value 属性访问该对象的值。
+(3) 变量只会被发到各个节点一次，应作为只读值处理（修改这个值不会影响到别的节点），使用的是
+一种高效的类似 BitTorrent 的通信机制。
+
+广播变量的优化：
+
+当广播一个比较大的值时，选择既快又好的序列化格式是很重要的，
+
+Spark的 Scala 和 Java API 中默认使用的序列化库为 Java 序列化库，
+
+因此它对于除基本类型的数组以外的任何对象都比较低效。
+
+你可以使用 spark.serializer 属性选择另一个序列化库来优化序列化过程（使用 Kryo 这种更快的序列化库），也可以为你的数据类型实现自己的序列化方式（对 Java 对象使用 java.io.Externalizable 接口实现序列化，或使用 reduce() 方法为 Python 的 pickle 库定义自定义的序列化）。
+
+### 基于分区进行操作
+
+基于分区对数据进行操作可以让我们避免为每个数据元素进行重复的配置工作。
+
+诸如打开数据库连接或创建随机数生成器等操作，都是我们应当尽量避免为每个元素都配置一次的工作。 
+
+Spark 提供基于分区 的 map 和 foreach，让你的部分代码只对 RDD 的每个分区运行一次，这样可以帮助降低这些操作的代价。
+
+有一个在线的业余电台呼号数据库，可以用这个数据库查询日志中记录过的联系人呼号列表。
+通过使用基于分区的操作，可以在每个分区内共享一个数据库连接池，来避免建立太多连接，同时还可以重用 JSON 解析器。
+
+```python
+
+def processCallSigns(signs):
+    """使用连接池查询呼号"""
+    # 创建一个连接池
+    http = urllib3.PoolManager()
+    # 与每条呼号记录相关联的URL
+    urls = map(lambda x: "http://73s.com/qsos/%s.json" % x, signs)
+    # 创建请求（非阻塞）
+    requests = map(lambda x: (x, http.request('GET', x)), urls)
+    # 获取结果
+    result = map(lambda x: (x[0], json.loads(x[1].data)), requests)
+    # 删除空的结果并返回
+    return filter(lambda x: x[1] is not None, result)
+
+def fetchCallSigns(input):
+    """获取呼号"""
+    return input.mapPartitions(lambda callSigns : processCallSigns(callSigns))
+
+contactsContactList = fetchCallSigns(validSigns)
+
+```
+
+使用 mapPartitions 函数获得输入 RDD 的每个分区中的元素迭代器，而需要返回的是执行结果的序列的迭代器。
+
+类似的还有 mapPartitionsWithIndex()  foreachPartitions()
+
+在 Python 中不使用 mapPartitions() 求平均值
+
+```python
+
+def combineCtrs(c1, c2):
+    return (c1[0] + c2[0], c1[1] + c2[1])
+
+def basicAvg(nums):
+    """计算平均值"""
+    return nums.map(lambda num: (num, 1)).reduce(combineCtrs)
+```
+
+在 Python 中使用 mapPartitions() 求平均值
+
+```python
+def partitionCtr(nums):
+    """计算分区的sumCounter"""
+    sumCount = [0, 0]
+    for num in nums:
+        sumCount[0] += num
+        sumCount[1] += 1
+    return [sumCount]
+
+def fastAvg(nums):
+    """计算平均值"""
+    sumCount = nums.mapPartitions(partitionCtr).reduce(combineCtrs)
+    return sumCount[0] / float(sumCount[1])
+
+```
+
+
+### 数值RDD的操作
+
+Spark 的数值操作是通过流式算法实现的，允许以每次一个元素的方式构建出模型。
+
+这些统计数据都会在调用 stats() 时通过一次遍历数据计算出来，并以 StatsCounter 对象返回。
+
+StatsCounter中可用的汇总统计数据:
+
+```python
+count() RDD 中的元素个数
+mean() 元素的平均值
+sum() 总和
+max() 最大值
+min() 最小值
+variance() 元素的方差
+sampleVariance() 从采样中计算出的方差
+stdev() 标准差
+sampleStdev() 采样的标准差
+```
+
+例如：
+
+```python
+In [27]: nums = sc.parallelize(range(10))
+
+In [28]: nums.mean(), nums.sum()
+Out[28]: (4.5, 45)
+
+In [30]: nums.stats()
+Out[30]: (count: 10, mean: 4.5, stdev: 2.87228132327, max: 9.0, min: 0.0)
+
+In [31]: st = nums.stats()
+
+In [33]: st.mean()
+Out[33]: 4.5
+
+```
+
+
+## 在集群上运行Spark
+
+### Spark运行时架构
+
+在分布式环境下， Spark 集群采用的是主 / 从结构。
+在一个 Spark 集群中，有一个节点负责中央协调，调度各个分布式工作节点。
+这个中央协调节点被称为驱动器（Driver）节点，与之对应的工作节点被称为执行器（executor）节点。
+驱动器节点可以和大量的执行器节点进行通信，它们也都作为独立的 Java 进程运行。
+驱动器节点和所有的执行器节点一起被称为一个 Spark 应用 （application）
+
+分布式 Spark 应用中的组件
+![lspark_model.png](/files/lspark_model.png)
+
+Spark 应用通过一个叫作集群管理器（Cluster Manager）的外部服务在集群中的机器上启动。 
+Spark 自带的集群管理器被称为独立集群管理器。 
+Spark 也能运行在 Hadoop YARN 和Apache Mesos 这两大开源集群管理器上。
 

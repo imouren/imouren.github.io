@@ -43,7 +43,13 @@ select sum(disable) from fv_video order by create_time desc limit 100000;
 select sum(disable) from (select disable from fv_video order by create_time desc limit 100000) a;
 ```
 
+## 随机取数据
 
+```python
+
+SELECT * FROM fun_theme_content WHERE id >= ((SELECT MAX(id) FROM fun_theme_content)-(SELECT MIN(id) FROM fun_theme_content)) * RAND() + (SELECT MIN(id) FROM fun_theme_content)  LIMIT 10;
+
+```
 
 
 
