@@ -13,6 +13,9 @@ tags:  linux
 ## 常用的安装包
 
 ```python
+yum groupinstall "Development Tools"
+yum install gtk+-devel gtk2-devel
+
 yum install openssl openssl-devel -y
 yum install sqlite-devel libffi-devel libxslt-devel -y
 yum install libjpeg-devel freetype-devel -y
