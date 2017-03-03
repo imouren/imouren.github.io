@@ -297,6 +297,14 @@ f.close()
 subprocess.check_call(['hdfs', 'dfs', '-put', f.name, path], shell=False)
 os.unlink(f.name)
 
+
+# 读取lzo文件
+import subprocess
+f_path = "/home/lzc/gotyou/hadoop/test.lzo"
+res = subprocess.Popen("lzop -cd " + f_path, shell=True, stdout=subprocess.PIPE)
+for line in res.stdout:
+    pass #process_line
+res.wait()
 ```
 
 ###  snakebite 命令行客户端
