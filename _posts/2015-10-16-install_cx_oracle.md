@@ -61,3 +61,27 @@ pip install cx_oracle
 {% endhighlight %}
 
 [官方网站]: http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
+
+### TensorFlow
+
+升级glibc
+
+```python
+../configure --prefix=/usr --disable-profile --enable-add-ons --with-headers=/usr/include --with-binutils=/usr/bin
+```
+
+问题：_pywrap_tensorflow.so: undefined symbol: PyUnicodeUCS4_AsUTF8String 
+
+```python
+重新编译python
+
+./configure --prefix=/usr --enable-unicode=ucs4
+
+问题： multiarray.so: undefined symbol: PyUnicodeUCS2_AsUTF8String
+
+删除numpy，在重新安装
+
+pip uninstall numpy
+
+pip install numpy
+```
