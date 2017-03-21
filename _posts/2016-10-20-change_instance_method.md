@@ -2,8 +2,8 @@
 layout: post
 title:  "动态更改python的类方法和实例方法"
 date:   2016-10-20 09:05:31
-categories: spark
-tags: spark
+categories: python
+tags: python
 ---
 
 * content

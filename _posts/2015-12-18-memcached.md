@@ -710,3 +710,36 @@ def get_mc_client(server):
 mclient1 = get_mc_client("192.168.xx.xx:11211")
 
 ```
+
+碰到过的问题
+
+java客户端写入缓存，默认用的flags是32，导致python客户端无法读取。这里可以修改下源码，适应下。
+
+```python
+
+import types
+
+def _expectvalue(self, server, line=None, raise_exception=False):
+    print server, line
+    if not line:
+        line = server.readline(raise_exception)
+
+    if line and line[:5] == b'VALUE':
+        resp, rkey, flags, len = line.split()
+        flags = int(flags)
+        rlen = int(len)
+        if flags == 32:
+            flags = 0
+        return (rkey, flags, rlen)
+    else:
+        return (None, None, None)
+
+def get_mc_client(server):
+    client = get_cache('django.core.cache.backends.memcached.MemcachedCache', **{
+        'LOCATION': server, 'TIMEOUT': None, "KEY_FUNCTION": lambda x, y, z: x
+    })
+    client.get_multi = client.get_many
+    client.get = client.get
+    client._cache._expectvalue = types.MethodType(_expectvalue, client._cache)
+    return client
+```
