@@ -51,7 +51,16 @@ SELECT * FROM fun_theme_content WHERE id >= ((SELECT MAX(id) FROM fun_theme_cont
 
 ```
 
+## varchar 查询 = 0
 
+``python
+select * from table_xx where varchar_filed = 0;
+查询出来的结果，并不是varchar_filed为 '0' 的。
+
+改写 select * from table_xx where varchar_filed = '0';
+```
+
+当比较数字和varchar时，mysql会把varchar转换为数字，首字符为数字0的，或者其他字符的都会转换为0，varchar类型字段=0 只能排除首字符为非零数字的字符串
 
 
 
