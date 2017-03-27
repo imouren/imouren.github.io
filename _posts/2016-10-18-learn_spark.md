@@ -45,7 +45,6 @@ log4j.rootCategory=WARN, console
 PYSPARK_DRIVER_PYTHON=ipython  ./bin/pyspark
 
 PYSPARK_DRIVER_PYTHON=ipython PYSPARK_DRIVER_PYTHON_OPTS="notebook --pylab  inline" ./bin/pyspark
-
 ```
 
 简单的行数统计
@@ -514,12 +513,12 @@ Out[5]: [('pink', (7, 2)), ('panda', (1, 2)), ('pirate', (3, 1))]
 更泛化的combineByKey() 接口可以让你自定义合并的行为。
 
 * combineByKey() 会遍历分区中的所有元素，因此每个元素的键要么还没有遇到过，要么就
-和之前的某个元素的键相同。
+  和之前的某个元素的键相同。
 
 * 如果这是一个新的元素， combineByKey() 会使用一个叫作 createCombiner() 的函数来创建那个键对应的累加器的初始值。需要注意的是，这一过程会在每个分区中第一次出现各个键时发生，而不是在整个 RDD 中第一次出现一个键时发生。
 
 * 如果这是一个在处理当前分区之前已经遇到的键，它会使用 mergeValue() 方法将该键的累
-加器对应的当前值与这个新的值进行合并。
+  加器对应的当前值与这个新的值进行合并。
 
 * 由于每个分区都是独立处理的，因此对于同一个键可以有多个累加器。如果有两个或者更多的分区都有对应同一个键的累加器，就需要使用用户提供的 mergeCombiners() 方法将各个分区的结果进行合并。
 
@@ -835,7 +834,7 @@ Out[33]: 4.5
 驱动器节点和所有的执行器节点一起被称为一个 Spark 应用 （application）
 
 分布式 Spark 应用中的组件
-![lspark_model.png](/files/lspark_model.png)
+![lspark_model.png](../files/lspark_model.png)
 
 Spark 应用通过一个叫作集群管理器（Cluster Manager）的外部服务在集群中的机器上启动。 
 Spark 自带的集群管理器被称为独立集群管理器。 
