@@ -90,7 +90,7 @@ lines = sc.textFile("/path/to/README.md")
 lines = sc.parallelize(["hello", "mouren"])
 ```
 
-###　RDD操作：转化操作和行动操作。
+### RDD操作：转化操作和行动操作。
 
 * 转化操作是返回一个新的RDD的操作，如map()和filter()
 * 行动操作则是向驱动程序返回结果或者是把结果写入到外部操作系统中，会触发实际的计算。如count()和first()
@@ -132,7 +132,7 @@ class WordFunctions(object):
         return rdd.filter(lambda x: query in x)
 ```
 
-###　常见的转化操作和行动操作
+### 常见的转化操作和行动操作
 
 #### 转换操作
 
