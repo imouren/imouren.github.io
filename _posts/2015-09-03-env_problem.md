@@ -35,6 +35,8 @@ yum install bzip2-devel zlib zlib-devel -y
 yum install cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-md5 cyrus-sasl-plain -y
 
 yum install screen -y
+
+yum install lzo-devel -y
 ```
 
 ## python 安装 readline错误
