@@ -189,3 +189,47 @@ In [4]: plt.show()
 
 ![绘图1](../files/data_analysis/1_1.png)
 
+### nltk
+
+自然语言处理工具包
+
+```python
+安装：pip install nltk
+引入：import nltk
+下载语料库： nltk.download()
+```
+
+
+
+应用：
+
+* 文本提取
+* 词汇切分
+* 词频分析
+* 词袋模型
+* 情感分析
+
+
+
+### igraph
+
+图计算和社交网络分析
+
+安装：
+
+```python
+pip install -U python-igraph
+conda install -c marufr python-igraph=0.7.1.post6
+```
+
+### Scikit-learn
+
+是建立在scipy之上的一个用于机器学习的python模块
+
+安装
+
+```python
+pip install -U scikit-learn
+conda install scikit-learn
+```
+
