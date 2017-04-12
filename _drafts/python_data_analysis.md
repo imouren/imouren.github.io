@@ -492,13 +492,13 @@ array([[[ 0.,  0.],
 
   **布尔型索引**
 
-  数组的比较运算也是矢量化的 （==   !=）
+  数组的比较运算也是矢量化的 （==   != ）
 
   布尔型数组可以用于数组索引，要求布尔型数组的长度必须跟被索引的轴的长度一致
 
   布尔型数组跟切片、整数可以混合使用
 
-  可以组合应用多个布尔条件，使用 &(和) |（或）运算即可
+  可以组合应用多个布尔条件，使用 &(和) |（或）~(非)运算即可
 
   通过布尔型数组设置值是一种常用手段，如将数组中所有小于0的设置为0
 
@@ -668,6 +668,8 @@ array([[[ 0.,  0.],
          [[ 8,  9, 10, 11],
           [12, 13, 14, 15]]])
 
+  # 第0个和第1个坐标互换
+  # a'[x][y][z] = a[y][x][z]
   In [134]: arr.transpose((1,0,2))
   Out[134]:
   array([[[ 0,  1,  2,  3],
@@ -701,4 +703,222 @@ array([[[ 0.,  0.],
           [11, 15]]])
   ```
 
+  ### 通用函数：快速的元素级数组函数
+
+  通用函数（ufunc）是一种对ndarray中的数据执行元素级运算的函数。
+
+  许多ufunc是简单元素级变体，如sqrt、exp都是一元函数。
+
+  另外一些，如add、maxinum接受两个数组，是二元函数，返回一个结果数组
+
+  有些特殊函数 modf返回多个数组，它是python的divmod的矢量化变体
+
+  ```python
+  In [148]: arr = np.arange(10)
+
+  In [149]: np.sqrt(arr)
+  Out[149]:
+  array([ 0.        ,  1.        ,  1.41421356,  1.73205081,  2.        ,
+          2.23606798,  2.44948974,  2.64575131,  2.82842712,  3.        ])
+  In [150]: x = np.random.randn(8)
+
+  In [151]: y = np.random.randn(8)
+      
+  In [153]: np.maximum(x, y)
+  Out[153]:
+  array([ 0.51955399,  0.50244785,  1.50765635,  1.57184637, -0.07270351,
+          0.70609317, -0.86336894, -0.60054656])
+
+  In [154]: arr = np.random.randn(7)*5
+
+  In [155]: np.modf(arr)
+  Out[155]:
+  (array([-0.91392983,  0.20031294, -0.22244219,  0.23778874,  0.69261585,
+           0.69194927, -0.25685396]), array([-2.,  1., -3.,  8.,  2.,  0., -1.]))
+  ```
+
+  常用函数
+
+  ![ufunc_1.png](../files/data_analysis/ufunc_1.png)
+
+  ![ufunc_1.png](../files/data_analysis/ufunc_2.png)
+
+  ### 利用数组进行数据处理
+
+  用数组表达式代替循环的做法，通常称为矢量化。
+
+  一般来说，矢量化数组运算比等价的纯python快一两个数量级。
+
+  假设我们想在一组值（网格型）上计算sqrt(x^2+y^2)
+
+  np.meshgrid函数接受两个一维数组，并产生两个二维矩阵（对应于两个数组所有的x,y对）
+
+  ```python
+  import matplotlib.pyplot as plt
+  import numpy as np
+  import pylab
+
+  points = np.arange(-5, 5, 0.01) # 生成100个点
+  xs, ys = np.meshgrid(points, points)  # xs, ys互为转置矩阵
+  z = np.sqrt(xs ** 2 + ys ** 2)
+  # 画图
+  plt.imshow(z, cmap = plt.cm.gray);
+  plt.colorbar()
+  plt.title("Image plot of $\sqrt{x^2 + y^2}$ for a grid of values")
+  pylab.show() 
+  ```
+
+  ### 将条件逻辑表述为数组运算
+
+  假设有两个数组，根据cond的值选取x_arr和y_arr的值：Truex选x_arr的值，否则取y_arr
+
+  我们可以用列表推导式来实现，但速度慢，无法处理多维数组。
+
+  np.where实现很快速简洁。
+
+  np.where 第二个和第三个参数不必是数组，他们可以是标量
+
+  ```python
+  In [172]: x_arr = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
+
+  In [173]: y_arr = np.array([2.1, 2.2, 2.3, 2.4, 2.5])
+
+  In [174]: cond = np.array([True, False, True, True, False])
+
+  # 列表表达式来实现
+  In [175]: result = [(x if c else y) for x, y, c in zip(x_arr, y_arr, cond)]
+
+  In [176]: result
+  Out[176]: [1.1000000000000001, 2.2000000000000002, 1.3, 1.3999999999999999, 2.5]
+  # 用np.where实现
+  In [177]: np.where(cond, x_arr, y_arr)
+  Out[177]: array([ 1.1,  2.2,  1.3,  1.4,  2.5])
+
+  In [178]: arr = np.random.randn(4,4)
+  # 矢 量
+  In [179]: np.where(arr>0, 2, -2)
+  Out[179]:
+  array([[ 2, -2, -2,  2],
+         [ 2, -2, -2,  2],
+         [ 2,  2, -2,  2],
+         [-2, -2,  2,  2]])
+  # 矢量标量 混用
+  In [180]: np.where(arr>0, 2, arr)
+  Out[180]:
+  array([[ 2.        , -0.75104522, -0.31914459,  2.        ],
+         [ 2.        , -0.90266597, -0.28003433,  2.        ],
+         [ 2.        ,  2.        , -0.17544682,  2.        ],
+         [-0.57475715, -0.36938037,  2.        ,  2.        ]])
+  ```
+
+  ### 数学和统计方法
+
+  可以通过数组上的一组数学函数对整个数组或者某个轴向的数据进行统计计算。
+
+  mean、sum既可以当做数组的实例方法，也可以做顶级NumPy函数调用
+
+  mean、sum这类函数可以接受一个axis参数（计算该轴的统计值），最终结果是少一维的数组
+
+  ```python
+  In [184]: arr = np.random.randn(5, 4)
+
+  In [185]: arr.mean()
+  Out[185]: -0.26580636498671667
+
+  In [186]: np.mean(arr)
+  Out[186]: -0.26580636498671667
+
+  In [187]: arr.sum()
+  Out[187]: -5.3161272997343332
+  ```
+
   ​
+
+![ufunc_1.png](../files/data_analysis/tongji_1.png)
+
+![ufunc_1.png](../files/data_analysis/tongji_2.png)
+
+### 用于布尔型数组的方法
+
+```python
+In [188]: arr = np.random.randn(100)
+
+In [189]: (arr>0).sum()
+Out[189]: 48
+
+In [190]: bools = np.array([False, False, True, False])
+
+In [191]: bools.any()
+Out[191]: True
+
+In [192]: bools.all()
+Out[192]: False
+```
+
+### 排序
+
+类似于列表可以用sort排序
+
+多维数组可以在任何一个轴上进行排序，只需要将轴编号传递给sort
+
+顶级方法np.sort 返回的是数组的已排序副本，而就地排序会修改数组本身。
+
+```python
+In [197]: arr = np.random.randn(8); arr
+Out[197]:
+array([ 0.5985591 ,  0.28215617, -0.46345863, -0.92394897, -0.620585  ,
+        0.76634099,  0.18505155,  1.16513665])
+
+In [198]: arr.sort();arr
+Out[198]:
+array([-0.92394897, -0.620585  , -0.46345863,  0.18505155,  0.28215617,
+        0.5985591 ,  0.76634099,  1.16513665])
+
+In [199]: arr = np.random.randn(5,3);arr
+Out[199]:
+array([[-0.48963625, -1.0665124 , -0.22732483],
+       [-0.45045068,  1.90308559,  0.4284296 ],
+       [ 0.06221939, -0.50142336, -1.51828131],
+       [-0.09930601, -0.31250197,  2.26411946],
+       [ 0.36338618,  0.65231805,  1.77791779]])
+
+In [200]: arr.sort(1);arr
+Out[200]:
+array([[-1.0665124 , -0.48963625, -0.22732483],
+       [-0.45045068,  0.4284296 ,  1.90308559],
+       [-1.51828131, -0.50142336,  0.06221939],
+       [-0.31250197, -0.09930601,  2.26411946],
+       [ 0.36338618,  0.65231805,  1.77791779]])
+# 选取5%分位数
+In [201]: large_arr = np.random.randn(1000)
+
+In [202]: large_arr.sort()
+
+In [203]: large_arr[int(0.05*len(large_arr))]
+Out[203]: -1.6525932091555453
+```
+
+### 唯一化以及其他集合逻辑
+
+找出数组唯一值，并返回排序的结果
+
+```python
+In [204]: names = np.array(["Bob", "Joe", "Will", "Bob", "Will", "Joe", "Joe"])
+
+In [205]: np.unique(names)
+Out[205]:
+array(['Bob', 'Joe', 'Will'],
+      dtype='|S4')
+
+# 等价的python代码
+In [206]: sorted(set(names))
+Out[206]: ['Bob', 'Joe', 'Will']
+
+# 测试一个数组中的值在另一个数组中的成员资格，返回布尔类型数组np.in1d
+In [207]: values = np.array([6,0,0,3,2,5,6])
+
+In [208]: np.in1d(values, [2,3,6])
+Out[208]: array([ True, False, False,  True,  True, False,  True], dtype=bool)
+```
+
+![ufunc_1.png](../files/data_analysis/unique.png)
