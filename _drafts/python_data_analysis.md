@@ -220,6 +220,10 @@ In [4]: plt.show()
 ```python
 pip install -U python-igraph
 conda install -c marufr python-igraph=0.7.1.post6
+或者
+下载 http://www.lfd.uci.edu/~gohlke/pythonlibs/#python-igraph
+python_igraph-0.7.1.post6-cp27-none-win_amd64.whl
+pip install python_igraph-0.7.1.post6-cp27-none-win_amd64.whl
 ```
 
 ### Scikit-learn
@@ -233,3 +237,124 @@ pip install -U scikit-learn
 conda install scikit-learn
 ```
 
+
+
+## Numpy
+
+Numpy是python的一个扩展库。支持高级大量的维度与矩阵运算，此外也针对数组运算提供大量的数学函数库。
+
+基本功能介绍：
+
+* 快速高效的多维数组对象ndarray
+* 用于对数组执行元素级计算以及直接对数组执行数学运算的函数
+* 用于读写硬盘上基于数组的数据集工具
+* 线性代数运算、傅里叶变换、随机数生成
+* 用于将C、C++、Fortran代码集成到python的工具
+* 作为算法之间的传递数据的容器
+
+
+
+效率对比，以求和为例：
+
+* 使用numpy.array 结构，并使用numpy.sum 函数效率最高
+* 使用list和array结构的时候，使用python的sum效率要搞
+
+
+
+### 创建ndarray
+
+![create_ndarray](../files/data_analysis/create_ndarray.png)
+
+```python
+In [47]: alist = range(10)
+In [48]: arr = np.array(alist); arr, arr.dtype, arr.shape
+Out[48]: (array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), dtype('int32'), (10L,))
+    
+In [49]: data = [[1, 2, 3, 4], [5, 6, 7, 8]]
+
+In [50]: arr2 = np.array(data);arr2, arr2.dtype, arr2.shape
+Out[50]:
+(array([[1, 2, 3, 4],
+        [5, 6, 7, 8]]), dtype('int32'), (2L, 4L))
+
+In [51]: np.zeros(10)
+Out[51]: array([ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.])
+
+In [52]: np.zeros((2,4))
+Out[52]:
+array([[ 0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.]])
+
+In [53]: np.empty((2,3,2))
+Out[53]:
+array([[[ 0.,  0.],
+        [ 0.,  0.],
+        [ 0.,  0.]],
+
+       [[ 0.,  0.],
+        [ 0.,  0.],
+        [ 0.,  0.]]])
+```
+
+注意：np.empty 里面仅仅是占位，元素没有初始化。
+
+### numpy的数据类型
+
+![num_data_struct_1.png](../files/data_analysis/num_data_struct_1.png)
+
+![num_data_struct_1.png](../files/data_analysis/num_data_struct_2.png)
+
+* 创建ndarray时指定dtype类型
+
+* 使用astype显示转换类型，astype进行了复制，原数组不变
+
+  ```python
+  In [54]: arr = np.array([1, 2, 3], dtype = np.float64); arr.dtype
+  Out[54]: dtype('float64')
+
+  In [55]: arr = np.array([1, 2, 3], dtype = np.int32); arr.dtype
+  Out[55]: dtype('int32')
+
+  In [57]: int_arr = np.array([1, 2, 3, 4, 5]); int_arr.dtype
+  Out[57]: dtype('int32')
+
+  In [58]: float_arr = int_arr.astype(np.float); float_arr.dtype
+  Out[58]: dtype('float64')
+
+  ```
+
+  ​
+
+### ndarray数组与标量之间的运算
+
+* 不用编写循环即可对数据执行批量运算
+
+* 大小相等的数组之间的任何算术运算都会将运算应用到元素级
+
+* 数组与标量的算术运算也会将那个标量的值传播到各个元素
+
+  ```python
+  In [62]: arr = np.array([[1.0, 2.0, 3.0], [4., 5., 6.]])
+
+  In [63]: arr * arr
+  Out[63]:
+  array([[  1.,   4.,   9.],
+         [ 16.,  25.,  36.]])
+
+  In [64]: arr - arr
+  Out[64]:
+  array([[ 0.,  0.,  0.],
+         [ 0.,  0.,  0.]])
+
+  In [65]: 1/arr
+  Out[65]:
+  array([[ 1.        ,  0.5       ,  0.33333333],
+         [ 0.25      ,  0.2       ,  0.16666667]])
+
+  In [67]: arr**.5
+  Out[67]:
+  array([[ 1.        ,  1.41421356,  1.73205081],
+         [ 2.        ,  2.23606798,  2.44948974]])
+  ```
+
+  ​
