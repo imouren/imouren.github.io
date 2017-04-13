@@ -741,7 +741,7 @@ array([[[ 0.,  0.],
 
   ![ufunc_1.png](../files/data_analysis/ufunc_1.png)
 
-  ![ufunc_1.png](../files/data_analysis/ufunc_2.png)
+  ![ufunc_2.png](../files/data_analysis/ufunc_2.png)
 
   ### 利用数组进行数据处理
 
@@ -834,7 +834,7 @@ array([[[ 0.,  0.],
 
   ​
 
-![ufunc_1.png](../files/data_analysis/tongji_1.png)
+![tongji_1.png](../files/data_analysis/tongji_1.png)
 
 ![ufunc_1.png](../files/data_analysis/tongji_2.png)
 
@@ -921,4 +921,147 @@ In [208]: np.in1d(values, [2,3,6])
 Out[208]: array([ True, False, False,  True,  True, False,  True], dtype=bool)
 ```
 
-![ufunc_1.png](../files/data_analysis/unique.png)
+![unique.png](../files/data_analysis/unique.png)
+
+### 数组文件的输入输出
+
+NumPy能够读写磁盘上的文本数据或者二进制数据。
+
+np.save和np.load是读写磁盘数组数据的两个函数。
+
+默认情况下，数组以未压缩的原始二进制格式保存在扩展名为.npy的文件中。
+
+```python
+In [209]: arr = np.arange(10)
+
+# 默认会自动加上.npy后缀
+In [210]: np.save("some_array", arr)
+
+In [211]: np.load("some_array.npy")
+Out[211]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+In [212]: arr2 = np.arange(20)
+
+# 将多个数组保存在一个压缩文件中
+In [213]: np.savez("array_archive.npz", a=arr, b=arr2)
+
+In [214]: arch = np.load("array_archive.npz")
+
+In [215]: arch["b"]
+Out[215]:
+array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
+       17, 18, 19])
+```
+
+### 线性代数
+
+```python
+In [216]: x = np.array([[1.,2.,3.],[4.,5.,6.]])
+
+In [217]: y = np.array([[6.,23.], [-1,7], [8,9]])
+
+In [218]: x.dot(y)
+Out[218]:
+array([[  28.,   64.],
+       [  67.,  181.]])
+
+# 与上面x.dot(y)等价
+In [219]: np.dot(x,y)
+Out[219]:
+array([[  28.,   64.],
+       [  67.,  181.]])
+# 一个二维数组跟一个大小合适的一维数组的矩阵点积运算之后得到一个一维数组
+In [220]: np.dot(x, np.ones(3))
+Out[220]: array([  6.,  15.])
+```
+
+![linalg.png](../files/data_analysis/linalg.png)
+
+### 随机数生成
+
+numpy.random模块对python内置的random进行了补充，增加了一些高效的生成概率分布的样本值函数。
+
+```python
+# normal得到一个4*4标准正态分布的数组
+In [221]: samples = np.random.normal(size=(4,4))
+
+In [222]: samples
+Out[222]:
+array([[-1.13988434, -1.09063543, -1.1260231 , -0.72939203],
+       [-0.17765671, -0.59351777, -1.7025208 ,  1.29316625],
+       [-0.48208534,  1.44957156,  0.15657483, -0.1689305 ],
+       [-0.843992  , -0.2221633 ,  0.32601053,  0.9355808 ]])
+```
+
+如果需要大量样本值，numpy.random比内置python的random快不止一个数量级
+
+```python
+In [223]: from random import normalvariate
+
+In [224]: N = 1000000
+
+In [225]: %timeit samples = [normalvariate(0,1) for _ in xrange(N)]
+1 loop, best of 3: 1.07 s per loop
+
+In [226]: %timeit np.random.normal(size=N)
+10 loops, best of 3: 46.3 ms per loop
+```
+
+![random_1.png](../files/data_analysis/random_1.png)
+
+![random_2.png](../files/data_analysis/random_2.png)
+
+### 范例：随机漫步
+
+从0开始，步长1和-1出现的概率相等。
+
+使用python的random实现
+
+```python
+import random
+position = 0
+walk = [position]
+steps = 1000
+for i in xrange(steps):
+    step = 1 if random.randint(0, 1) else -1
+    position += step
+    walk.append(position)
+```
+
+使用np.random实现，并统计最大、最小值
+
+```python
+nsteps = 1000
+draws = np.random.randint(0, 2, size=nsteps)
+steps = np.where(draws > 0, 1, -1)
+walk = steps.cumsum()
+
+In [245]: walk.min()
+Out[245]: -18
+
+In [246]: walk.max()
+Out[246]: 9
+    
+# 首次穿越时间，第一次穿越5的时间，用argmax来解决，返回的是布尔型数组第一个最大值的索引。
+In [250]: (np.abs(walk) >= 5).argmax()
+Out[250]: 6
+```
+
+一次模拟多个随机漫步，使用np.random很容易实现
+
+```python
+nwalks = 5000
+nsteps = 1000
+# size改为二维数组
+draws = np.random.randint(0, 2, size=(nwalks, nsteps))
+steps = np.where(draws > 0, 1, -1)
+# 在nsteps上连续求和
+walks = steps.cumsum(1)
+```
+
+也可以使用其他方式进行随机漫步
+
+`steps = np.random.normal(loc=0, scale=0.25, size=(nwalks, nsteps))`
+
+
+
