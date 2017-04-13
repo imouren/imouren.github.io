@@ -237,6 +237,44 @@ pip install -U scikit-learn
 conda install scikit-learn
 ```
 
+### 练习题
+
+找出数组numbers中的两个数，他们的和为target，返回这两个数的下标
+
+```python
+from collections import defaultdict
+
+
+def get_index_tuple(alist, target):
+    res = []
+    for i, x in enumerate(alist):
+        if x > target:
+            continue
+        for j, y in enumerate(alist[i:]):
+            if (x + y) == target:
+                index = (i, i + j)
+                res.append(index)
+    return res
+
+# 将值存到hash，再遍历的时候，根据差值找
+def get_index_tuple_hash(alist, target):
+    res = []
+    data = defaultdict(list)
+    for i, x in enumerate(alist):
+        data[x].append(i)
+    for i, x in enumerate(alist):
+        diff = target - x
+        if diff in data:
+            for j in data[diff]:
+                if j != i:
+                    res.append((i, j))
+    return res
+
+alist, target = [2, 7, 11, 7, 17], 9
+print get_index_tuple(alist, target)
+print get_index_tuple_hash(alist, target)
+```
+
 
 
 ## Numpy
@@ -703,6 +741,36 @@ array([[[ 0.,  0.],
           [11, 15]]])
   ```
 
+  ### 数组的重塑
+
+  使用reshape可以重塑数组
+
+  -1 代表自动推断维度
+
+  ravel可以将高维数组拉平
+
+  ```python
+  In [255]: arr = np.arange(10)
+
+  In [256]: arr.reshape((2,5))
+  Out[256]:
+  array([[0, 1, 2, 3, 4],
+         [5, 6, 7, 8, 9]])
+
+  In [260]: x = arr.reshape((5, -1));x
+  Out[260]:
+  array([[0, 1],
+         [2, 3],
+         [4, 5],
+         [6, 7],
+         [8, 9]])
+
+  In [261]: x.ravel()
+  Out[261]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  ```
+
+  ​
+
   ### 通用函数：快速的元素级数组函数
 
   通用函数（ufunc）是一种对ndarray中的数据执行元素级运算的函数。
@@ -973,6 +1041,18 @@ array([[  28.,   64.],
 # 一个二维数组跟一个大小合适的一维数组的矩阵点积运算之后得到一个一维数组
 In [220]: np.dot(x, np.ones(3))
 Out[220]: array([  6.,  15.])
+    
+In [263]: from numpy.linalg import inv, qr
+
+In [265]: X = np.random.randn(5,5)
+
+In [266]: mat = X.T.dot(X) # 
+
+In [268]: inv(mat)  # 矩阵求逆
+ 
+In [269]: mat.dot(inv(mat))  # 与逆矩阵相乘，得到单位矩阵
+    
+In [270]: q,r=qr(mat)  # 矩阵消元
 ```
 
 ![linalg.png](../files/data_analysis/linalg.png)
@@ -1062,6 +1142,123 @@ walks = steps.cumsum(1)
 也可以使用其他方式进行随机漫步
 
 `steps = np.random.normal(loc=0, scale=0.25, size=(nwalks, nsteps))`
+
+
+
+## numpy高级应用
+
+### ndarray对象的内部机理
+
+ndarray内部有以下内容组成：
+
+* 一个指向数组（一个系统内存块）的指针
+
+* 数据类型或者dtype
+
+* 一个表示数组形状的元组shape
+
+* 一个跨度元组stride，其中的整数是为了前进到当前维度下一个元组跨过的字节数
+
+  ```python
+  In [277]: np.ones((10, 5)).shape
+  Out[277]: (10L, 5L)
+
+  # float64 8个字节
+  In [278]: np.ones((3,4,5), dtype=np.float64).strides
+  Out[278]: (160L, 40L, 8L)
+  ```
+
+### Numpy数据类型体系
+
+dtype都有一个超类，如np.integer和np.floating ，可以用np.issubdtype判断某个dtype的大类
+
+调用dtype的mro方法可以查看其所有的父类
+
+```python
+In [279]: ints = np.ones(10, dtype=np.uint16)
+
+In [280]: floats = np.ones(10, dtype=np.float32)
+
+In [281]: np.issubdtype(ints.dtype, np.integer)
+Out[281]: True
+
+In [282]: np.issubdtype(floats.dtype, np.floating)
+Out[282]: True
+
+In [283]: np.float64.mro()
+Out[283]:
+[numpy.float64,
+ numpy.floating,
+ numpy.inexact,
+ numpy.number,
+ numpy.generic,
+ float,
+ object]
+```
+
+![dtype.png](../files/data_analysis/dtype.png)
+
+### 高级数组操作
+
+#### 数组重塑
+
+数组就可以从一个形状换为另一个形状reshape
+
+多维数组也可以被重塑
+
+参数形状的其中一维可以是-1，大小由数据本身推断而来
+
+将多维数组扁平化可以使用ravel函数或者flatten函数
+
+```python
+In [300]: arr = np.arange(8)
+
+In [301]: arr.reshape(2,4)
+Out[301]:
+array([[0, 1, 2, 3],
+       [4, 5, 6, 7]])
+
+In [303]: x = arr.reshape(2,4).reshape(4,2);x
+Out[303]:
+array([[0, 1],
+       [2, 3],
+       [4, 5],
+       [6, 7]])
+
+In [304]: x.ravel()
+Out[304]: array([0, 1, 2, 3, 4, 5, 6, 7])
+
+In [305]: x.flatten()
+Out[305]: array([0, 1, 2, 3, 4, 5, 6, 7])
+```
+
+#### C和Fortran顺序
+
+默认numpy按照行优先顺序创建的。
+
+由于一些历史原因，行和列优先顺序被称为C和Fortran顺序
+
+reshape和ravel这样的函数，都可以接受一个表示数组数据存放顺序的order参数
+
+一般可以为“C”或者"F"，
+
+C 行优先顺序，先经过更高的维度
+
+F 列优先顺序，后经过更高的维度
+
+```python
+In [306]: arr = np.arange(12).reshape(3, 4);arr
+Out[306]:
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+
+In [307]: arr.ravel()
+Out[307]: array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
+
+In [308]: arr.ravel("F")
+Out[308]: array([ 0,  4,  8,  1,  5,  9,  2,  6, 10,  3,  7, 11])
+```
 
 
 
