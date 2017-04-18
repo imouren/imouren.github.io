@@ -56,18 +56,18 @@ conda install matplotlib
 *   可以直接对数组的每个元素进行操作
 
     ```python
-    In [1]: import numpy as np
+      In [1]: import numpy as np
 
-    In [2]: np.arange(10)
-    Out[2]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+      In [2]: np.arange(10)
+      Out[2]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-    In [3]: a = _
+      In [3]: a = _
 
-    In [4]: a ** 2
-    Out[4]: array([ 0,  1,  4,  9, 16, 25, 36, 49, 64, 81])
+      In [4]: a ** 2
+      Out[4]: array([ 0,  1,  4,  9, 16, 25, 36, 49, 64, 81])
     ```
 
-    ​
+      ​
 
 ### Scipy
 
@@ -371,19 +371,20 @@ array([[[ 0.,  0.],
 
 ### ndarray数组与标量之间的运算
 
-* 不用编写循环即可对数据执行批量运算
+*    不用编写循环即可对数据执行批量运算
 
-* 大小相等的数组之间的任何算术运算都会将运算应用到元素级
+*    大小相等的数组之间的任何算术运算都会将运算应用到元素级
 
-* 数组与标量的算术运算也会将那个标量的值传播到各个元素
+*    数组与标量的算术运算也会将那个标量的值传播到各个元素
 
-  ```python
-  In [62]: arr = np.array([[1.0, 2.0, 3.0], [4., 5., 6.]])
+     ```python
+     In [62]: arr = np.array([[1.0, 2.0, 3.0], [4., 5., 6.]])
 
-  In [63]: arr * arr
-  Out[63]:
-  array([[  1.,   4.,   9.],
-         [ 16.,  25.,  36.]])
+     In [63]: arr * arr
+     Out[63]:
+     array([[  1.,   4.,   9.],
+     [ 16.,  25.,  36.]])
+     ```
 
   In [64]: arr - arr
   Out[64]:
@@ -419,7 +420,7 @@ array([[[ 0.,  0.],
 
   跟列表的重要区别是：**数组切片是原始数组的视图，数据不会被复制，视图的任何修改都被反应到源数组上。**如果想要复制，可以显示操作`arr[5:8].copy()`
 
-  ```python
+```python
   In [77]: arr_slice= arr[5:8]
 
   In [78]: arr_slice[1] = 12345
@@ -432,13 +433,13 @@ array([[[ 0.,  0.],
   In [81]: arr
   Out[81]: array([ 0,  1,  2,  3,  4, 64, 64, 64,  8,  9])
 
-  ```
+```
 
   在二维数组中，各个索引位置上的元素不再是标量，而是一维数组。
 
   可以对元素进行递归访问，也可以逗号隔开的索引选取单个元素。
 
-  ```python
+```python
   In [88]: arr2d = np.array([[1,2,3],[4,5,6],[7,8,9]])
 
   In [89]: arr2d[2]
@@ -449,13 +450,13 @@ array([[[ 0.,  0.],
 
   In [91]: arr2d[0,2]
   Out[91]: 3
-  ```
+```
 
   在多维数组中，如果省略了后面的索引，返回对象是一个维度低一点的ndarray
 
   标量值和数组都可以被赋值给arr3d[0]
 
-  ```python
+```python
   In [94]: arr3d = np.array([[[1,2,3], [4,5,6]],[[7,8,9], [10,11,12]]])
 
   In [95]: arr3d
@@ -491,7 +492,7 @@ array([[[ 0.,  0.],
 
   In [100]: arr3d[1, 0]
   Out[100]: array([7, 8, 9])
-  ```
+```
 
   **切片索引**
 
@@ -501,7 +502,7 @@ array([[[ 0.,  0.],
 
   “冒号”表示选取整个轴
 
-  ```python
+```python
   In [101]: arr2d
   Out[101]:
   array([[1, 2, 3],
@@ -526,7 +527,7 @@ array([[[ 0.,  0.],
   array([[1],
          [4],
          [7]])
-  ```
+```
 
   **布尔型索引**
 
@@ -540,7 +541,7 @@ array([[[ 0.,  0.],
 
   通过布尔型数组设置值是一种常用手段，如将数组中所有小于0的设置为0
 
-  ```python
+```python
   In [107]: names = np.array(["Bob", "Joe", "Will", "Bob", "Will", "Joe", "Joe"])
 
   In [108]: data = np.random.randn(7, 4)
@@ -588,7 +589,7 @@ array([[[ 0.,  0.],
          [ 0.28012105,  0.10510227,  0.        ,  0.        ],
          [ 1.80042063,  0.        ,  0.        ,  0.80808786],
          [ 0.        ,  0.        ,  0.        ,  0.        ]])
-  ```
+```
 
   **花式索引**
 
@@ -600,7 +601,7 @@ array([[[ 0.,  0.],
 
   要选取矩阵的行列子集应该使用矩形区域的形式才可以。
 
-  ```python
+```python
   # 一个8*4的数组
   In [117]: arr = np.empty((8,4))
 
@@ -656,7 +657,7 @@ array([[[ 0.,  0.],
          [20, 23, 21, 22],
          [28, 31, 29, 30],
          [ 8, 11,  9, 10]])
-  ```
+```
 
   ### 数组转置和轴兑换
 
@@ -670,7 +671,7 @@ array([[[ 0.,  0.],
 
   swapaxes 也是返回源数据的视图
 
-  ```python
+```python
   In [128]: arr = np.arange(15).reshape((3,5))
 
   In [129]: arr
@@ -739,7 +740,7 @@ array([[[ 0.,  0.],
           [ 9, 13],
           [10, 14],
           [11, 15]]])
-  ```
+```
 
   ### 数组的重塑
 
@@ -749,7 +750,7 @@ array([[[ 0.,  0.],
 
   ravel可以将高维数组拉平
 
-  ```python
+```python
   In [255]: arr = np.arange(10)
 
   In [256]: arr.reshape((2,5))
@@ -767,7 +768,7 @@ array([[[ 0.,  0.],
 
   In [261]: x.ravel()
   Out[261]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-  ```
+```
 
   ​
 
@@ -781,7 +782,7 @@ array([[[ 0.,  0.],
 
   有些特殊函数 modf返回多个数组，它是python的divmod的矢量化变体
 
-  ```python
+```python
   In [148]: arr = np.arange(10)
 
   In [149]: np.sqrt(arr)
@@ -803,7 +804,7 @@ array([[[ 0.,  0.],
   Out[155]:
   (array([-0.91392983,  0.20031294, -0.22244219,  0.23778874,  0.69261585,
            0.69194927, -0.25685396]), array([-2.,  1., -3.,  8.,  2.,  0., -1.]))
-  ```
+```
 
   常用函数
 
@@ -821,7 +822,7 @@ array([[[ 0.,  0.],
 
   np.meshgrid函数接受两个一维数组，并产生两个二维矩阵（对应于两个数组所有的x,y对）
 
-  ```python
+```python
   import matplotlib.pyplot as plt
   import numpy as np
   import pylab
@@ -834,7 +835,7 @@ array([[[ 0.,  0.],
   plt.colorbar()
   plt.title("Image plot of $\sqrt{x^2 + y^2}$ for a grid of values")
   pylab.show() 
-  ```
+```
 
   ### 将条件逻辑表述为数组运算
 
@@ -846,7 +847,7 @@ array([[[ 0.,  0.],
 
   np.where 第二个和第三个参数不必是数组，他们可以是标量
 
-  ```python
+```python
   In [172]: x_arr = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
 
   In [173]: y_arr = np.array([2.1, 2.2, 2.3, 2.4, 2.5])
@@ -877,7 +878,7 @@ array([[[ 0.,  0.],
          [ 2.        , -0.90266597, -0.28003433,  2.        ],
          [ 2.        ,  2.        , -0.17544682,  2.        ],
          [-0.57475715, -0.36938037,  2.        ,  2.        ]])
-  ```
+```
 
   ### 数学和统计方法
 
@@ -887,7 +888,7 @@ array([[[ 0.,  0.],
 
   mean、sum这类函数可以接受一个axis参数（计算该轴的统计值），最终结果是少一维的数组
 
-  ```python
+```python
   In [184]: arr = np.random.randn(5, 4)
 
   In [185]: arr.mean()
@@ -898,7 +899,7 @@ array([[[ 0.,  0.],
 
   In [187]: arr.sum()
   Out[187]: -5.3161272997343332
-  ```
+```
 
   ​
 
@@ -1467,4 +1468,344 @@ array([[-0.19948325,  0.07588051, -0.19948325, -1.01561382],
 ### TODO
 
 
+
+## Pandas 
+
+pandas = panel data + data analysis
+
+pandas 是基于numpy构建的，让以numpy为中心的应用变得更简单。
+
+约定引入
+
+```python
+from pandas import Series, DataFrame, Index
+import pandas as pd
+import numpy as np
+```
+
+### pandas数据结构
+
+pandas的两个主要数据结构：Series 和 DataFrame
+
+#### Series
+
+类似于一维数组对象，由一组数据以及一组与之相关的数据标签（索引）组成。
+
+Series的字符串表示形式为：索引在左边，值在右边。没有指定索引会自动创建0到N-1的整数索引。
+
+通过values和index属性获取数组表示形式和索引对象
+
+```python
+# 自动添加的索引
+In [5]: obj = Series([4,7,-5,3])
+
+In [6]: obj
+Out[6]:
+0    4
+1    7
+2   -5
+3    3
+dtype: int64
+    
+In [7]: obj.values
+Out[7]: array([ 4,  7, -5,  3], dtype=int64)
+
+In [8]: obj.index
+Out[8]: RangeIndex(start=0, stop=4, step=1)
+    
+# 指定索引
+In [9]: obj2 = Series([4,7,-5,3], index=list('dbac'))
+
+In [10]: obj2
+Out[10]:
+d    4
+b    7
+a   -5
+c    3
+dtype: int64
+
+In [11]: obj2.index
+Out[11]: Index([u'd', u'b', u'a', u'c'], dtype='object')
+```
+
+可以通过索引的方式选取Series的单个或者一组值
+
+numpy数组运算都会保留索引和值之间的链接
+
+```python
+In [12]: obj2['a']
+Out[12]: -5
+
+In [13]: obj2['d'] = 6
+
+In [14]: obj2[['c', 'a', 'd']]
+Out[14]:
+c    3
+a   -5
+d    6
+dtype: int64
+    
+In [15]: obj2[obj2 > 0]
+Out[15]:
+d    6
+b    7
+c    3
+dtype: int64
+
+In [16]: obj2*2
+Out[16]:
+d    12
+b    14
+a   -10
+c     6
+dtype: int64
+```
+
+Series可以看出一个定长的有序字典，它是索引值到数据值的一个映射
+
+也可以直接通过字典来创建Series，只传入字典series的索引就是字典的键
+
+NaN 表示缺失值
+
+pandas的 isnull 和 notnull函数用于检测缺失数据
+
+```python
+In [17]: 'b' in obj2
+Out[17]: True
+
+In [18]: sdata = {"Ohio": 35000, "Texas": 71000, "Oregon": 16000, "Utah": 5000}
+
+In [19]: obj3 = Series(sdata)
+
+In [20]: obj3
+Out[20]:
+Ohio      35000
+Oregon    16000
+Texas     71000
+Utah       5000
+dtype: int64
+
+# 指定其他索引
+In [21]: states = ["California", "Ohio", "Oregon", "Texas"]
+
+In [22]: obj4 = Series(sdata, index=states)
+
+In [23]: obj4
+Out[23]:
+California        NaN  # 缺失值
+Ohio          35000.0
+Oregon        16000.0
+Texas         71000.0
+dtype: float64
+    
+# 缺失值的判断
+In [24]: obj4.isnull()
+Out[24]:
+California     True
+Ohio          False
+Oregon        False
+Texas         False
+dtype: bool
+
+In [25]: pd.isnull(obj4)
+Out[25]:
+California     True
+Ohio          False
+Oregon        False
+Texas         False
+dtype: bool
+
+In [26]: pd.notnull(obj4)
+Out[26]:
+California    False
+Ohio           True
+Oregon         True
+Texas          True
+dtype: bool
+```
+
+Series最重要的一个功能就是，它在算术运算中会自动对齐不同索引的数据
+
+```python
+In [27]: obj3 + obj4
+Out[27]:
+California         NaN
+Ohio           70000.0
+Oregon         32000.0
+Texas         142000.0
+Utah               NaN
+dtype: float64
+```
+
+Series本身和index都有一个name属性，该属性跟pandas其他的关键功能关系非常密切
+
+series的索引可以通过赋值的方式修改
+
+```python
+In [28]: obj4.name = "population"
+
+In [29]: obj4.index.name = "state"
+
+In [30]: obj4
+Out[30]:
+state
+California        NaN
+Ohio          35000.0
+Oregon        16000.0
+Texas         71000.0
+Name: population, dtype: float64
+
+In [31]: obj.index = ["Bob", "Steve", "Jeff", "Ryan"]
+
+In [32]: obj
+Out[32]:
+Bob      4
+Steve    7
+Jeff    -5
+Ryan     3
+dtype: int64
+```
+
+#### DataFrame
+
+DataFrame是一个表格型数据结构，它含有一组有序的列，每列可以是不同的值类型。
+
+它既有行索引也有列索引，它可以看做是由Series组成的字典。
+
+
+
+最常见构建DataFrame的方式，传入一个由等长列表或者numpy数组组成的字典
+
+DataFrame会自动加上索引，且全部列都会被有序排列
+
+如果指定了列顺序，则按照指定顺序排列
+
+```python
+In [40]: data = {'state':['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+    ...:         'year':[2000, 2001, 2002, 2001, 2002],
+    ...:         'pop':[1.5, 1.7, 3.6, 2.4, 2.9]}
+
+In [41]: frame = DataFrame(data);frame
+Out[41]:
+   pop   state  year
+0  1.5    Ohio  2000
+1  1.7    Ohio  2001
+2  3.6    Ohio  2002
+3  2.4  Nevada  2001
+4  2.9  Nevada  2002
+
+# 指定序列
+In [44]: DataFrame(data, columns=["year", "state", "pop"])
+Out[44]:
+   year   state  pop
+0  2000    Ohio  1.5
+1  2001    Ohio  1.7
+2  2002    Ohio  3.6
+3  2001  Nevada  2.4
+4  2002  Nevada  2.9
+
+```
+
+如果传入的列在数据中找不到，则产生NA值
+
+```python
+In [45]: frame2 = DataFrame(data,
+    ...:                     columns = ['year', 'state', 'pop', 'debt'],
+    ...:                     index = ['one', 'two', 'three', 'four', 'five'])
+
+In [46]: frame2
+Out[46]:
+       year   state  pop debt
+one    2000    Ohio  1.5  NaN
+two    2001    Ohio  1.7  NaN
+three  2002    Ohio  3.6  NaN
+four   2001  Nevada  2.4  NaN
+five   2002  Nevada  2.9  NaN
+```
+
+可以通过类似字典标记的方式或者属性方式，将DataFrame获取一个列为一个Series
+
+返回的Series拥有原DataFrame相同的索引，且name属性也被设置好了
+
+```python
+In [47]: frame2['state']
+Out[47]:
+one        Ohio
+two        Ohio
+three      Ohio
+four     Nevada
+five     Nevada
+Name: state, dtype: object
+
+In [48]: frame2.year
+Out[48]:
+one      2000
+two      2001
+three    2002
+four     2001
+five     2002
+Name: year, dtype: int64
+```
+
+列可以通过赋值的方式修改。给一个标量值或者一组值
+
+将列表或者数组赋值给某个列时，长度要匹配；如果赋值的是一个Series，会精确匹配DataFrame的索引，所有空位将被填上缺失值
+
+```python
+In [49]: frame2["debt"] = 16.5
+
+In [50]: frame2
+Out[50]:
+       year   state  pop  debt
+one    2000    Ohio  1.5  16.5
+two    2001    Ohio  1.7  16.5
+three  2002    Ohio  3.6  16.5
+four   2001  Nevada  2.4  16.5
+five   2002  Nevada  2.9  16.5
+
+In [51]: frame2["debt"] = np.arange(5.);frame2
+Out[51]:
+       year   state  pop  debt
+one    2000    Ohio  1.5   0.0
+two    2001    Ohio  1.7   1.0
+three  2002    Ohio  3.6   2.0
+four   2001  Nevada  2.4   3.0
+five   2002  Nevada  2.9   4.0
+
+# 赋值一个series，缺失值
+In [52]: val = Series([-1.2, -1.5, -1.7], index = ['two', 'four', 'five'])
+
+In [53]: frame2["debt"] = val;frame2
+Out[53]:
+       year   state  pop  debt
+one    2000    Ohio  1.5   NaN
+two    2001    Ohio  1.7  -1.2
+three  2002    Ohio  3.6   NaN
+four   2001  Nevada  2.4  -1.5
+five   2002  Nevada  2.9  -1.7
+```
+
+赋值新列和删除列
+
+```python
+In [54]: frame2['eastern'] = (frame2.state == 'Ohio')
+
+In [55]: frame2
+Out[55]:
+       year   state  pop  debt eastern
+one    2000    Ohio  1.5   NaN    True
+two    2001    Ohio  1.7  -1.2    True
+three  2002    Ohio  3.6   NaN    True
+four   2001  Nevada  2.4  -1.5   False
+five   2002  Nevada  2.9  -1.7   False
+
+In [56]: frame2.columns
+Out[56]: Index([u'year', u'state', u'pop', u'debt', u'eastern'], dtype='object')
+
+
+In [57]: del frame2["eastern"]
+
+In [58]: frame2.columns
+Out[58]: Index([u'year', u'state', u'pop', u'debt'], dtype='object')
+```
 
