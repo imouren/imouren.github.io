@@ -1674,7 +1674,7 @@ DataFrame是一个表格型数据结构，它含有一组有序的列，每列�
 
 
 
-最常见构建DataFrame的方式，传入一个由等长列表或者numpy数组组成的字典
+**最常见构建DataFrame的方式，传入一个由等长列表或者numpy数组组成的字典**
 
 DataFrame会自动加上索引，且全部列都会被有序排列
 
@@ -1808,4 +1808,1770 @@ In [57]: del frame2["eastern"]
 In [58]: frame2.columns
 Out[58]: Index([u'year', u'state', u'pop', u'debt'], dtype='object')
 ```
+
+
+
+**另外一种创建DataFrame的方式是字典嵌套字典。**
+
+外层字典的键作为列，内存键作为行索引。
+
+```python
+In [60]: pop = {'Nevada':{2001:2.4, 2002:2.9},
+    ...:         'Ohio':{2000:1.5, 2001:1.7, 2002:3.6}}
+
+In [61]: frame3 = DataFrame(pop);frame3
+Out[61]:
+      Nevada  Ohio
+2000     NaN   1.5
+2001     2.4   1.7
+2002     2.9   3.6
+```
+
+转置
+
+```python
+In [62]: frame3.T
+Out[62]:
+        2000  2001  2002
+Nevada   NaN   2.4   2.9
+Ohio     1.5   1.7   3.6
+```
+
+显示指定索引
+
+```python
+In [63]: DataFrame(pop, index=[2001, 2002, 2003])
+Out[63]:
+      Nevada  Ohio
+2001     2.4   1.7
+2002     2.9   3.6
+2003     NaN   NaN
+```
+
+如果设置DataFrame的index和columns的name属性，则这些信息也会显示出来
+
+```python
+In [64]: frame3.index.name = "year";frame3.columns.name = "state"
+
+In [65]: frame3
+Out[65]:
+state  Nevada  Ohio
+year
+2000      NaN   1.5
+2001      2.4   1.7
+2002      2.9   3.6
+```
+
+#### 索引对象
+
+pandas的索引对象负责管理轴标签和其他元数据。
+
+构建series和dataframe时，所用到的任何数组或者其他序列的标签都会被转换为Index
+
+```python
+In [71]: obj = Series(range(3), index = ['a', 'b', 'c'])
+
+In [72]: index = obj.index;index
+Out[72]: Index([u'a', u'b', u'c'], dtype='object')
+```
+
+**Index对象是不可以修改的，这样才能使Index对象在多个数据结构之间安全共享**
+
+```python
+In [73]: index[1] = 'xx'
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-73-96f7c34da2c6> in <module>()
+----> 1 index[1] = 'xx'
+
+C:\ProgramData\Anaconda2\envs\py27\lib\site-packages\pandas\indexes\base.pyc in
+__setitem__(self, key, value)
+   1402
+   1403     def __setitem__(self, key, value):
+-> 1404         raise TypeError("Index does not support mutable operations")
+   1405
+   1406     def __getitem__(self, key):
+
+TypeError: Index does not support mutable operations
+    
+# 索引共享
+In [74]: index = Index(np.arange(3))
+
+In [75]: obj2 = Series([1.5, -2.5, 0], index = index)
+
+In [76]: obj2.index is index
+Out[76]: True
+```
+
+Index的方法和属性
+
+![index.png](../files/data_analysis/index.png)
+
+### 基本功能
+
+#### 重新索引
+
+reindex方法，创建一个适应新索引的新对象
+
+可以通过fill_value参数指定缺失值的填充
+
+```python
+In [77]: obj = Series([4.5, 7.2, -5.3, 3.6], index = ['d', 'b', 'a', 'c']);obj
+Out[77]:
+d    4.5
+b    7.2
+a   -5.3
+c    3.6
+dtype: float64
+
+In [78]: obj2 = obj.reindex(['a', 'b', 'd', 'c', 'e']);obj2
+Out[78]:
+a   -5.3
+b    7.2
+d    4.5
+c    3.6
+e    NaN
+dtype: float64
+
+# 指定填充元素
+In [79]: obj.reindex(['a', 'b', 'd', 'c', 'e'], fill_value = 0)
+Out[79]:
+a   -5.3
+b    7.2
+d    4.5
+c    3.6
+e    0.0
+dtype: float64
+```
+
+对于时间序列这样的有序数据，重新索引时，可能需要做一些插值处理。通过method参数进行
+
+method的值：
+
+* ffill或者pad              向前填充值
+* bfill或者backfill        向后填充值
+
+```python
+In [80]: obj3 = Series(['blue', 'purple', 'yellow'], index = [0, 2, 4]);obj3
+Out[80]:
+0      blue
+2    purple
+4    yellow
+dtype: object
+
+In [81]: obj3.reindex(range(6), method = 'ffill')
+Out[81]:
+0      blue
+1      blue
+2    purple
+3    purple
+4    yellow
+5    yellow
+dtype: object
+```
+
+使用columns参数可以重新索引列
+
+也可以同时重新索引行和列，而插值只能按行来应用。
+
+利用ix的标签索引功能，重新索引标签更简洁。
+
+```python
+In [83]: frame = DataFrame(np.arange(9).reshape(3, 3),
+    ...:                   index = ['a', 'c', 'd'],
+    ...:                   columns = ['Ohio', 'Texas', 'California'])
+
+In [84]: states = ['Texas', 'Utah', 'California']
+
+# 重新索引行
+In [85]: frame.reindex(columns = states)
+Out[85]:
+   Texas  Utah  California
+a      1   NaN           2
+c      4   NaN           5
+d      7   NaN           8
+
+# 重新索引行和列，并填充数据
+In [86]: frame.reindex(index = ['a', 'b', 'c', 'd'], method = 'ffill', columns
+    ...: = states)
+Out[86]:
+   Texas  Utah  California
+a      1   NaN           2
+b      1   NaN           2
+c      4   NaN           5
+d      7   NaN           8
+
+# ix标签重新索引
+In [91]: fx =  frame.ix[['a', 'b', 'c', 'd'], states];fx
+Out[91]:
+   Texas  Utah  California
+a    1.0   NaN         2.0
+b    NaN   NaN         NaN
+c    4.0   NaN         5.0
+d    7.0   NaN         8.0
+```
+
+#### 丢弃指定轴上的项
+
+drop方法返回一个指定轴上删除了指定值的新对象
+
+```python
+In [92]: obj = Series(np.arange(5.), index = ['a', 'b', 'c', 'd', 'e'])
+
+In [93]: new_obj = obj.drop('c');new_obj
+Out[93]:
+a    0.0
+b    1.0
+d    3.0
+e    4.0
+dtype: float64
+```
+
+对于DataFrame，可以删除任意轴上的索引值
+
+```python
+In [94]: data = DataFrame(np.arange(16).reshape((4, 4)),
+    ...:                   index = ['Ohio', 'Colorado', 'Utah', 'New York'],
+    ...:                   columns = ['one', 'two', 'three', 'four'])
+
+In [95]: data.drop(['Colorado', 'Ohio'])
+Out[95]:
+          one  two  three  four
+Utah        8    9     10    11
+New York   12   13     14    15
+
+# 删除列
+In [96]: data.drop('two', axis = 1)
+Out[96]:
+          one  three  four
+Ohio        0      2     3
+Colorado    4      6     7
+Utah        8     10    11
+New York   12     14    15
+
+In [97]: data.drop(['two', 'four'], axis = 1)
+Out[97]:
+          one  three
+Ohio        0      2
+Colorado    4      6
+Utah        8     10
+New York   12     14
+```
+
+#### 索引、选取、过滤
+
+Series的索引和numpy类型，此外还支持标签索引。
+
+用标签切片索引的时候，是闭区间。
+
+```python
+In [98]: obj = Series(np.arange(4.), index = ['a', 'b', 'c', 'd'])
+
+In [99]: obj
+Out[99]:
+a    0.0
+b    1.0
+c    2.0
+d    3.0
+dtype: float64
+
+In [100]: obj['b']
+Out[100]: 1.0
+
+In [101]: obj[1]
+Out[101]: 1.0
+
+In [102]: obj[2:4]
+Out[102]:
+c    2.0
+d    3.0
+dtype: float64
+
+In [103]: obj[['b', 'a', 'd']]
+Out[103]:
+b    1.0
+a    0.0
+d    3.0
+dtype: float64
+
+In [104]: obj[1:3]
+Out[104]:
+b    1.0
+c    2.0
+dtype: float64
+
+In [105]: obj[obj>2]
+Out[105]:
+d    3.0
+dtype: float64
+
+In [106]: obj["b":"c"]
+Out[106]:
+b    1.0
+c    2.0
+dtype: float64
+
+# 重新设置值
+In [107]: obj["b":"c"] = 4;obj
+Out[107]:
+a    0.0
+b    4.0
+c    4.0
+d    3.0
+dtype: float64
+```
+
+对于DataFrame进行索引就是获取一个或者多个列
+
+通过切片或者布尔数组选取行
+
+还可以通过布尔型DataFrame进行索引
+
+```python
+In [108]: data = DataFrame(np.arange(16).reshape((4, 4)),
+     ...:                   index = ['Ohio', 'Colorado', 'Utah', 'New York'],
+     ...:                   columns = ['one', 'two', 'three', 'four'])
+
+In [109]: data['two']
+Out[109]:
+Ohio         1
+Colorado     5
+Utah         9
+New York    13
+Name: two, dtype: int32
+
+In [110]: data[['three', 'one']]
+Out[110]:
+          three  one
+Ohio          2    0
+Colorado      6    4
+Utah         10    8
+New York     14   12
+
+# 通过切片或者布尔数组选取行
+In [111]: data[:2]
+Out[111]:
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+
+In [112]: data[data["three"]>5]
+Out[112]:
+          one  two  three  four
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+
+# 通过布尔型dataframe进行索引
+In [113]: data < 5
+Out[113]:
+            one    two  three   four
+Ohio       True   True   True   True
+Colorado   True  False  False  False
+Utah      False  False  False  False
+New York  False  False  False  False
+
+In [114]: data[data<5] = 0; data
+Out[114]:
+          one  two  three  four
+Ohio        0    0      0     0
+Colorado    0    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+```
+
+为了方便在DataFrame的行上进行标签索引，专门引入索引字段ix
+
+```python
+In [115]: data.ix['Colorado', ['two', 'three']]
+Out[115]:
+two      5
+three    6
+Name: Colorado, dtype: int32
+
+In [116]: data.ix[['Colorado', 'Utah'], [3, 0, 1]]
+Out[116]:
+          four  one  two
+Colorado     7    0    5
+Utah        11    8    9
+
+In [117]: data.ix[2]
+Out[117]:
+one       8
+two       9
+three    10
+four     11
+Name: Utah, dtype: int32
+
+In [118]: data.ix[:'Utah', 'two']
+Out[118]:
+Ohio        0
+Colorado    5
+Utah        9
+Name: two, dtype: int32
+```
+
+![df_index.png](../files/data_analysis/df_index.png)
+
+#### 算术运算和数据对齐
+
+pandas最重要的一个功能就是可以对不同索引的对象进行算术运算
+
+如果存在不同索引时，则结果会的索引是该索引对的并集。
+
+自动的数据对齐操作在不重叠索引处引入NA值，缺失值会在运算过程中传播
+
+```python
+In [119]: s1 = Series([7.3, -2.5, 3.4, 1.5], index = ['a', 'c', 'd', 'e'])
+
+In [120]: s2 = Series([-2.1, 3.6, -1.5, 4, 3.1], index = ['a', 'c', 'e', 'f', 'g'])
+
+In [121]: s1
+Out[121]:
+a    7.3
+c   -2.5
+d    3.4
+e    1.5
+dtype: float64
+
+In [122]: s2
+Out[122]:
+a   -2.1
+c    3.6
+e   -1.5
+f    4.0
+g    3.1
+dtype: float64
+
+In [123]: s1 + s2
+Out[123]:
+a    5.2
+c    1.1
+d    NaN
+e    0.0
+f    NaN
+g    NaN
+dtype: float64
+```
+
+DataFrame对齐操作会同时发生在行和列上
+
+可以使用add等函数传入fill_value参数取代NA值
+
+```python
+In [124]: df1 = DataFrame(np.arange(9.).reshape((3, 3)),
+     ...:                 columns = list('bcd'),
+     ...:                 index = ['Ohio', 'Texas', 'Colorado'])
+
+In [125]: df2 = DataFrame(np.arange(12).reshape((4, 3)),
+     ...:                 columns = list('bde'),
+     ...:                 index = ['Utah', 'Ohio', 'Texas', 'Oregon'])
+
+In [126]: df1
+Out[126]:
+            b    c    d
+Ohio      0.0  1.0  2.0
+Texas     3.0  4.0  5.0
+Colorado  6.0  7.0  8.0
+
+In [127]: df2
+Out[127]:
+        b   d   e
+Utah    0   1   2
+Ohio    3   4   5
+Texas   6   7   8
+Oregon  9  10  11
+
+In [128]: df1 + df2
+Out[128]:
+            b   c     d   e
+Colorado  NaN NaN   NaN NaN
+Ohio      3.0 NaN   6.0 NaN
+Oregon    NaN NaN   NaN NaN
+Texas     9.0 NaN  12.0 NaN
+Utah      NaN NaN   NaN NaN
+
+# 填充值
+In [129]: df1.add(df2, fill_value=0)
+Out[129]:
+            b    c     d     e
+Colorado  6.0  7.0   8.0   NaN
+Ohio      3.0  1.0   6.0   5.0
+Oregon    9.0  NaN  10.0  11.0
+Texas     9.0  4.0  12.0   8.0
+Utah      0.0  NaN   1.0   2.0
+```
+
+#### DataFrame与Series之间的运算
+
+启发性的一个例子，多维数组与一维数组运算
+
+```python
+In [130]: arr = np.arange(12.).reshape((3, 4))
+
+In [131]: arr
+Out[131]:
+array([[  0.,   1.,   2.,   3.],
+       [  4.,   5.,   6.,   7.],
+       [  8.,   9.,  10.,  11.]])
+
+In [132]: arr[0]
+Out[132]: array([ 0.,  1.,  2.,  3.])
+
+In [133]: arr - arr[0]
+Out[133]:
+array([[ 0.,  0.,  0.,  0.],
+       [ 4.,  4.,  4.,  4.],
+       [ 8.,  8.,  8.,  8.]])
+```
+
+默认情况下，DataFrame和Series之间的算术运算将Series的索引匹配到DataFrame的列，然后沿着行一直广播
+
+也可以匹配行，在列上进行广播
+
+```python
+In [134]: frame = DataFrame(np.arange(12).reshape((4, 3)),
+     ...:                   columns = list('bde'),
+     ...:                   index = ['Utah', 'Ohio', 'Texas', 'Oregon'])
+
+In [135]: series = frame.ix[0]
+
+In [136]: frame
+Out[136]:
+        b   d   e
+Utah    0   1   2
+Ohio    3   4   5
+Texas   6   7   8
+Oregon  9  10  11
+
+In [137]: series
+Out[137]:
+b    0
+d    1
+e    2
+Name: Utah, dtype: int32
+
+In [138]: frame - series
+Out[138]:
+        b  d  e
+Utah    0  0  0
+Ohio    3  3  3
+Texas   6  6  6
+Oregon  9  9  9
+
+# 匹配行，在列上进行广播
+In [140]: series2 = frame['d']
+
+In [141]: frame.sub(series2, axis = 0)
+Out[141]:
+        b  d  e
+Utah   -1  0  1
+Ohio   -1  0  1
+Texas  -1  0  1
+Oregon -1  0  1
+```
+
+#### 函数应用和映射
+
+NumPy的ufuncs（元素级数组方法）也可以操作pandas对象
+
+将函数应用到由各列或者行形成的一维数组上，可以使用dataframe的apply方法
+
+```python
+In [142]: frame = DataFrame(np.random.randn(4, 3),
+     ...:                   columns = list('bde'),
+     ...:                   index = ['Utah', 'Ohio', 'Texas', 'Oregon'])
+
+In [143]: frame = DataFrame(np.random.randn(4, 3),
+     ...:                   columns = list('bde'),
+     ...:                   index = ['Utah', 'Ohio', 'Texas', 'Oregon']);frame
+     ...:
+Out[143]:
+               b         d         e
+Utah    1.906876 -0.170450 -0.776105
+Ohio   -2.003380 -1.564231  0.698176
+Texas  -0.740390 -1.509397 -1.699133
+Oregon -1.149953  0.600829  0.423726
+
+In [144]: np.abs(frame)
+Out[144]:
+               b         d         e
+Utah    1.906876  0.170450  0.776105
+Ohio    2.003380  1.564231  0.698176
+Texas   0.740390  1.509397  1.699133
+Oregon  1.149953  0.600829  0.423726
+```
+
+apply 方法
+
+除了标量外，传递给apply函数还可以返回由多个值组成的Series
+
+```python
+In [146]: frame.apply(f)
+Out[146]:
+b    3.910256
+d    2.165060
+e    2.397309
+dtype: float64
+
+In [147]: frame.apply(f, axis=1)
+Out[147]:
+Utah      2.682981
+Ohio      2.701557
+Texas     0.958743
+Oregon    1.750782
+dtype: float64
+    
+    
+In [148]: def f(x):
+     ...:     return Series([x.min(), x.max()], index = ['min', 'max'])
+     ...:
+
+In [149]: frame.apply(f)
+Out[149]:
+            b         d         e
+min -2.003380 -1.564231 -1.699133
+max  1.906876  0.600829  0.698176
+```
+
+元素级的python函数也可以用，使用applymap即可
+
+之所以叫applymap，是因为Series有个map方法
+
+```python
+In [150]: _format = lambda x: '%.2f' % x
+
+In [151]: frame.applymap(_format)
+Out[151]:
+            b      d      e
+Utah     1.91  -0.17  -0.78
+Ohio    -2.00  -1.56   0.70
+Texas   -0.74  -1.51  -1.70
+Oregon  -1.15   0.60   0.42
+
+In [152]: frame['e'].map(_format)
+Out[152]:
+Utah      -0.78
+Ohio       0.70
+Texas     -1.70
+Oregon     0.42
+Name: e, dtype: object
+
+```
+
+#### 排序和排名
+
+要对行或者列排序，可以用sort_index方法，返回一个排序好的新对象
+
+```python
+In [153]: obj = Series(range(4), index = ['d', 'a', 'b', 'c'])
+
+In [154]: obj.sort_index()
+Out[154]:
+a    1
+b    2
+c    3
+d    0
+dtype: int64
+```
+
+对于DataFrame可以根据任意一个轴上的索引进行排序
+
+```python
+In [155]: frame = DataFrame(np.arange(8).reshape((2, 4)),
+     ...:                   index = ['three', 'one'],
+     ...:                   columns = list('dabc'))
+
+# 行索引排序
+In [156]: frame.sort_index()
+Out[156]:
+       d  a  b  c
+one    4  5  6  7
+three  0  1  2  3
+# 列索引排序
+In [157]: frame.sort_index(axis = 1)
+Out[157]:
+       a  b  c  d
+three  1  2  3  0
+one    5  6  7  4
+# 倒序
+In [158]: frame.sort_index(axis = 1, ascending = False)
+Out[158]:
+       d  c  b  a
+three  0  3  2  1
+one    4  7  6  5
+```
+
+根据值排序sort_values
+
+```python
+# series
+In [159]: obj = Series([4, 7, -3, 2])
+
+In [160]: obj.sort_values()
+Out[160]:
+2   -3
+3    2
+0    4
+1    7
+dtype: int64
+    
+# dataframe
+In [162]: frame = DataFrame({'b':[4, 7, -3, 2], 'a':[0, 1, 0, 1]});frame
+Out[162]:
+   a  b
+0  0  4
+1  1  7
+2  0 -3
+3  1  2
+
+In [163]: frame.sort_values(by = 'b')
+Out[163]:
+   a  b
+2  0 -3
+3  1  2
+0  0  4
+1  1  7
+
+In [164]: frame.sort_values(by = ['a', 'b'])
+Out[164]:
+   a  b
+2  0 -3
+0  0  4
+3  1  2
+1  1  7
+```
+
+排名（ranking）会增设一个排名值。从1开始。
+
+默认分配平均排名，通过method可以破坏平级关系
+
+* average 默认，相等分组，各个值平均排名
+* min 使用分组的最小排名
+* max使用分组的最大排名
+* first 按值在原始数据中出现顺序排名
+
+```python
+In [165]: obj = Series([7, -5, 7, 4, 2, 0, 4])
+
+In [166]: obj.rank()
+Out[166]:
+0    6.5
+1    1.0
+2    6.5
+3    4.5
+4    3.0
+5    2.0
+6    4.5
+dtype: float64
+
+In [167]: obj.rank(method = 'first')
+Out[167]:
+0    6.0
+1    1.0
+2    7.0
+3    4.0
+4    3.0
+5    2.0
+6    5.0
+dtype: float64
+
+In [168]: obj.rank(ascending = False, method = 'max')
+Out[168]:
+0    2.0
+1    7.0
+2    2.0
+3    4.0
+4    5.0
+5    6.0
+6    4.0
+dtype: float64
+    
+# dataframe
+In [170]: frame = DataFrame({'b':[4.3, 7, -3, 2],
+     ...:                   'a':[0, 1, 0, 1],
+     ...:                   'c':[-2, 5, 8, -2.5]});frame
+     ...:
+Out[170]:
+   a    b    c
+0  0  4.3 -2.0
+1  1  7.0  5.0
+2  0 -3.0  8.0
+3  1  2.0 -2.5
+
+In [171]: frame.rank(axis=1)
+Out[171]:
+     a    b    c
+0  2.0  3.0  1.0
+1  1.0  3.0  2.0
+2  2.0  1.0  3.0
+3  2.0  3.0  1.0
+```
+
+#### 带重复值的轴索引
+
+可以有带有重复索引值的Series
+
+索引的is_unique属性告诉我们它的值是否唯一
+
+某个索引对应多个值，返回一个series；单个值，返回标量
+
+```python
+In [172]: obj = Series(range(5), index = ['a', 'a', 'b', 'b', 'c'])
+
+In [173]: obj
+Out[173]:
+a    0
+a    1
+b    2
+b    3
+c    4
+dtype: int64
+
+In [174]: obj.index.is_unique
+Out[174]: False
+    
+In [177]: obj['a']
+Out[177]:
+a    0
+a    1
+dtype: int64
+
+In [178]: obj['c']
+Out[178]: 4
+```
+
+对于DataFrame同样如此
+
+```python
+In [180]: df
+Out[180]:
+          0         1         2
+a  0.294717 -0.527044  0.026601
+a  1.285979  0.360563 -0.430542
+b  0.338660 -1.256754  0.029843
+b  0.353240 -2.690445 -0.671609
+
+In [181]: df.ix["a"]
+Out[181]:
+          0         1         2
+a  0.294717 -0.527044  0.026601
+a  1.285979  0.360563 -0.430542
+```
+
+### 汇总和计算描述统计
+
+pandas对拥有一组常用数学和统计的方法。
+
+它们大部分都属于简约和汇总统计，用于从Series中提取单个值或者从DataFrame的行或者列中提取一个Series。
+
+NA值会被自动排除，除非整个切片都是NA；通过skipna选项可以禁用排除功能。
+
+axis=1 将会按照行进行汇总操作。
+
+```python
+In [185]: df = DataFrame([[1.4, np.nan], [7.1, -4.5], [np.nan, np.nan], [0.75,
+     ...: -1.3]],
+     ...:     index=['a', 'b', 'c', 'd'],
+     ...:     columns=['one', 'two']);df
+     ...:
+Out[185]:
+    one  two
+a  1.40  NaN
+b  7.10 -4.5
+c   NaN  NaN
+d  0.75 -1.3
+
+# 按列求和
+In [186]: df.sum()
+Out[186]:
+one    9.25
+two   -5.80
+dtype: float64
+# 按行求和
+In [187]: df.sum(axis=1)
+Out[187]:
+a    1.40
+b    2.60
+c     NaN
+d   -0.55
+dtype: float64
+    
+# 使用skipna参数
+In [188]: df.mean(axis=1, skipna=False)
+Out[188]:
+a      NaN
+b    1.300
+c      NaN
+d   -0.275
+dtype: float64
+```
+
+有些方法返回的是间接统计。如idxmin、idxmax
+
+有些方法则是累计型的，如cumsum
+
+还有是一次性汇总的，如describe
+
+```python
+# 最大值的索引
+In [189]: df.idxmax()
+Out[189]:
+one    b
+two    d
+dtype: object
+
+# 累计求和
+In [190]: df.cumsum()
+Out[190]:
+    one  two
+a  1.40  NaN
+b  8.50 -4.5
+c   NaN  NaN
+d  9.25 -5.8
+
+# 多个汇总
+In [191]: df.describe()
+Out[191]:
+            one       two
+count  3.000000  2.000000
+mean   3.083333 -2.900000
+std    3.493685  2.262742
+min    0.750000 -4.500000
+25%    1.075000 -3.700000
+50%    1.400000 -2.900000
+75%    4.250000 -2.100000
+max    7.100000 -1.300000
+
+# 对于非数值的数据，describe产生另一种汇总
+In [192]: obj = Series(["a", "a", "b", "c"]*4)
+
+In [193]: obj.describe()
+Out[193]:
+count     16
+unique     3
+top        a
+freq       8
+dtype: object
+```
+
+![describe_1.png](../files/data_analysis/describe_1.png)
+
+![describe_1.png](../files/data_analysis/describe_2.png)
+
+
+
+#### 相关系数与协方差
+
+相关系数是用以反映变量之间相关关系密切程度的统计指标。
+
+协方差用于衡量两个变量的总体误差。而方差是协方差的一种特殊情况，即当两个变量是相同的情况。
+
+如果两个变量的变化趋势一致，也就是说如果其中一个大于自身的期望值时另外一个也大于自身的期望值，那么两个变量之间的协方差就是正值；如果两个变量的变化趋势相反，即其中一个变量大于自身的期望值时另外一个却小于自身的期望值，那么两个变量之间的协方差就是负值。
+
+获取yahoo财经数据
+
+```python
+import pandas_datareader.data as web
+import datetime
+
+start = datetime.datetime(2016, 1, 1)
+end = datetime.datetime(2017, 1, 1)
+all_data = {}
+for ticker in ['IBM', 'MSFT', 'GOOG']:
+    all_data[ticker] = web.DataReader(ticker, 'yahoo', start, end)
+```
+
+进行分析
+
+```python
+In [32]: price = DataFrame({tic: data['Adj Close'] for tic, data in all_data.it
+    ...: eritems()})
+
+In [33]: volume = DataFrame({tic: data['Volume'] for tic, data in all_data.iter
+    ...: items()})
+
+# 计算价格的百分比变化
+In [34]: returns = price.pct_change()
+
+In [35]: returns.tail()
+Out[35]:
+                GOOG       IBM      MSFT
+Date
+2016-12-23 -0.001706 -0.002095 -0.004878
+2016-12-27  0.002076  0.002579  0.000632
+2016-12-28 -0.008212 -0.005684 -0.004583
+2016-12-29 -0.002879  0.002467 -0.001429
+2016-12-30 -0.014014 -0.003661 -0.012083
+
+# 计算微软和IBM的相关性
+In [36]: returns.MSFT.corr(returns.IBM)
+Out[36]: 0.43196013226149715
+# 所有相关性
+In [37]: returns.corr()
+Out[37]:
+          GOOG       IBM      MSFT
+GOOG  1.000000  0.339863  0.700009
+IBM   0.339863  1.000000  0.431960
+MSFT  0.700009  0.431960  1.000000
+# 协方差
+In [38]: returns.cov()
+Out[38]:
+          GOOG       IBM      MSFT
+GOOG  0.000157  0.000053  0.000125
+IBM   0.000053  0.000155  0.000077
+MSFT  0.000125  0.000077  0.000204
+
+# 相关系数 传入的是Series
+In [39]: returns.corrwith(returns.IBM)
+Out[39]:
+GOOG    0.339863
+IBM     1.000000
+MSFT    0.431960
+dtype: float64
+
+# 传入dataframe会计算按列名称配对的相关系数
+# 这里计算百分比变化和成交量的相关系数
+In [42]: returns.corrwith(volume)
+Out[42]:
+GOOG   -0.297810
+IBM    -0.186286
+MSFT   -0.207625
+dtype: float64
+```
+
+#### 唯一值、值计数以及成员资格
+
+* isin 计算一个表示 series值是否包含于传入值序列中的 布尔型数组
+* unique 计算series中唯一值数组，按发行顺序返回
+* value_counts 返回一个series，其索引为唯一值，值为频率，按计算降序排列
+
+```python
+In [46]: obj = Series(['c', 'a', 'd', 'a', 'a', 'b', 'b', 'c', 'c'])
+# 唯一值序列
+In [47]: uniques = obj.unique();uniques
+Out[47]: array(['c', 'a', 'd', 'b'], dtype=object)
+# 重新排序
+In [48]: uniques.sort()
+
+In [49]: uniques
+Out[49]: array(['a', 'b', 'c', 'd'], dtype=object)
+# 计数值
+In [50]: obj.value_counts()
+Out[50]:
+c    3
+a    3
+b    2
+d    1
+dtype: int64
+# 成员资格    
+In [51]: mask = obj.isin(['b', 'c']);mask
+Out[51]:
+0     True
+1    False
+2    False
+3    False
+4    False
+5     True
+6     True
+7     True
+8     True
+dtype: bool
+
+In [52]: obj[mask]
+Out[52]:
+0    c
+5    b
+6    b
+7    c
+8    c
+dtype: object
+```
+
+按列统计dataframe的计数
+
+```python
+In [53]: data = DataFrame({'Qu1':[1, 3, 4, 3, 4],
+    ...:                   'Qu2':[2, 3, 1, 2, 3],
+    ...:                   'Qu3':[1, 5, 2, 4, 4]})
+
+In [54]: data
+Out[54]:
+   Qu1  Qu2  Qu3
+0    1    2    1
+1    3    3    5
+2    4    1    2
+3    3    2    4
+4    4    3    4
+
+In [55]: data.apply(pd.value_counts).fillna(0)
+Out[55]:
+   Qu1  Qu2  Qu3
+1  1.0  1.0  1.0
+2  0.0  2.0  1.0
+3  2.0  2.0  0.0
+4  2.0  0.0  2.0
+5  0.0  0.0  1.0
+```
+
+### 处理缺失数据
+
+pandas使用浮点值NaN(Not a Number)表示浮点和非浮点数组中的确实数据。
+
+python内置的None值也会被当做NA处理。
+
+```python
+In [56]: string_data = Series(['aardvark', 'artichoke', np.nan, 'avocado'])
+
+In [57]: string_data
+Out[57]:
+0     aardvark
+1    artichoke
+2          NaN
+3      avocado
+dtype: object
+
+In [58]: string_data.isnull()
+Out[58]:
+0    False
+1    False
+2     True
+3    False
+dtype: bool
+
+In [59]: string_data[0] = None
+
+In [60]: string_data.isnull()
+Out[60]:
+0     True
+1    False
+2     True
+3    False
+dtype: bool
+```
+
+![na.png](../files/data_analysis/na.png)
+
+#### 滤除缺失值
+
+series可以通过dropna或者使用布尔型索引过滤缺失值
+
+```python
+In [61]: from numpy import nan as NA
+
+In [62]: data = Series([1, NA, 3.5, NA, 7])
+
+In [63]: data.dropna()
+Out[63]:
+0    1.0
+2    3.5
+4    7.0
+dtype: float64
+
+In [64]: data[data.notnull()]
+Out[64]:
+0    1.0
+2    3.5
+4    7.0
+dtype: float64
+```
+
+对于DataFrame对象，dropna默认丢弃任何含有缺失值的行
+
+传入how="all"将只会丢弃全部NA的行
+
+也可以丢弃列 axis=1 即可
+
+```python
+In [65]: data = DataFrame([[1., 6.5, 3.], [1., NA, NA],
+    ...:                   [NA, NA, NA], [NA, 6.5, 3.]])
+
+In [66]: data.dropna()
+Out[66]:
+     0    1    2
+0  1.0  6.5  3.0
+
+In [67]: data.dropna(how = 'all')
+Out[67]:
+     0    1    2
+0  1.0  6.5  3.0
+1  1.0  NaN  NaN
+3  NaN  6.5  3.0
+
+In [68]: data[4] = NA
+
+In [69]: data
+Out[69]:
+     0    1    2   4
+0  1.0  6.5  3.0 NaN
+1  1.0  NaN  NaN NaN
+2  NaN  NaN  NaN NaN
+3  NaN  6.5  3.0 NaN
+
+In [70]: data.dropna(axis = 1, how = 'all')
+Out[70]:
+     0    1    2
+0  1.0  6.5  3.0
+1  1.0  NaN  NaN
+2  NaN  NaN  NaN
+3  NaN  6.5  3.0
+
+```
+
+另一种滤除DataFrame数据设计时间序列数据。
+
+如果想保留部分观测数据，可以使用thresh参数。保留至少N个非NA数据
+
+```python
+In [71]: data = DataFrame(np.random.randn(7, 3))
+
+In [72]: data.ix[:4, 1] = NA;data.ix[:2, 2] = NA
+
+In [73]: data
+Out[73]:
+          0         1         2
+0 -0.836018       NaN       NaN
+1 -0.528263       NaN       NaN
+2 -0.752886       NaN       NaN
+3  0.118052       NaN -1.584697
+4 -1.504957       NaN -1.370345
+5  0.708274  1.275797  0.544763
+6 -2.241146 -0.126952  1.498033
+
+# 保留至少2个NA数据的行
+In [74]: data.dropna(thresh=2)
+Out[74]:
+          0         1         2
+3  0.118052       NaN -1.584697
+4 -1.504957       NaN -1.370345
+5  0.708274  1.275797  0.544763
+6 -2.241146 -0.126952  1.498033
+```
+
+#### 填充缺失数据
+
+使用fillna函数。
+
+参数：
+
+* value   用于填充缺失值的标量或者字典对象
+* method  插值方式 默认为“ffill”
+* axis   待填充的轴 默认 0
+* inplace 修改调用对象而不产生新副本
+* limit 可以连续填充的最大数量
+
+```python
+In [75]: df = DataFrame(np.random.randn(7, 3))
+
+In [76]: df.ix[:4, 1] = NA;df.ix[:2, 2] = NA
+
+# 填充0
+In [77]: df.fillna(0)
+Out[77]:
+          0         1         2
+0 -0.311015  0.000000  0.000000
+1  0.798764  0.000000  0.000000
+2 -0.315612  0.000000  0.000000
+3 -0.789025  0.000000  0.033316
+4  1.228627  0.000000  1.587054
+5 -1.234994 -0.767786  0.290474
+6 -1.290352  0.704390 -0.115428
+
+# 填充不同的值
+In [87]: df.fillna({1:0.5, 3:-1})
+Out[87]:
+          0         1         2
+0  1.455894  0.500000       NaN
+1  0.824706  0.500000       NaN
+2 -0.232208  0.500000       NaN
+3  0.321752  0.500000  2.519580
+4 -0.190785  0.500000 -0.806347
+5  0.918847 -0.400067 -1.099423
+6  1.046522  0.348059 -0.039359
+
+# 不产生副本
+In [78]: df.fillna(0, inplace=True);df
+Out[78]:
+          0         1         2
+0 -0.311015  0.000000  0.000000
+1  0.798764  0.000000  0.000000
+2 -0.315612  0.000000  0.000000
+3 -0.789025  0.000000  0.033316
+4  1.228627  0.000000  1.587054
+5 -1.234994 -0.767786  0.290474
+6 -1.290352  0.704390 -0.115428
+```
+
+### 层次化索引
+
+层次化索引，在一个轴上拥有多个索引级别。
+
+```python
+In [88]: data = Series(np.random.randn(10),
+    ...:               index = [['a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'd', 'd'],
+    ...:                        [1, 2, 3, 1, 2, 3, 1, 2, 2, 3]])
+
+# 带有MultiIndex索引的series格式化输出
+In [89]: data
+Out[89]:
+a  1    0.254289
+   2   -1.017712
+   3    0.219640
+b  1   -0.544635
+   2   -0.594767
+   3    0.843953
+c  1    1.085519
+   2   -1.968604
+d  2    0.541540
+   3    0.572308
+dtype: float64
+
+In [90]: data.index
+Out[90]:
+MultiIndex(levels=[[u'a', u'b', u'c', u'd'], [1, 2, 3]],
+           labels=[[0, 0, 0, 1, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 1, 2, 0, 1, 1, 2
+]])
+
+# 选取子集
+In [91]: data['b':'c']
+Out[91]:
+b  1   -0.544635
+   2   -0.594767
+   3    0.843953
+c  1    1.085519
+   2   -1.968604
+dtype: float64
+
+In [92]: data[:2]
+Out[92]:
+a  1    0.254289
+   2   -1.017712
+dtype: float64
+
+# 在内层进行选取
+In [93]: data[:, 2]
+Out[93]:
+a   -1.017712
+b   -0.594767
+c   -1.968604
+d    0.541540
+dtype: float64
+
+# unstack方法将被重新安排到DataFrame中
+In [94]: data.unstack()
+Out[94]:
+          1         2         3
+a  0.254289 -1.017712  0.219640
+b -0.544635 -0.594767  0.843953
+c  1.085519 -1.968604       NaN
+d       NaN  0.541540  0.572308
+
+# unstack 的逆运算是stack
+In [95]: data.unstack().stack()
+Out[95]:
+a  1    0.254289
+   2   -1.017712
+   3    0.219640
+b  1   -0.544635
+   2   -0.594767
+   3    0.843953
+c  1    1.085519
+   2   -1.968604
+d  2    0.541540
+   3    0.572308
+dtype: float64
+
+```
+
+对DataFrame来说，每个轴都可以有分层索引
+
+各个层都可以有名字
+
+```python
+In [96]: frame = DataFrame(np.arange(12).reshape((4, 3)),
+    ...:                   index = [['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+    ...:                   columns = [['Ohio', 'Ohio', 'Colorado'], ['Green', '
+    ...: Red', 'Green']])
+
+In [97]: frame
+Out[97]:
+     Ohio     Colorado
+    Green Red    Green
+a 1     0   1        2
+  2     3   4        5
+b 1     6   7        8
+  2     9  10       11
+
+In [98]: frame.index.names = ['key1', 'key2']
+
+In [99]: frame.columns.names = ['state', 'color']
+
+In [100]: frame
+Out[100]:
+state      Ohio     Colorado
+color     Green Red    Green
+key1 key2
+a    1        0   1        2
+     2        3   4        5
+b    1        6   7        8
+     2        9  10       11
+# 选取列索引
+In [101]: frame["Ohio", "Red"]
+Out[101]:
+key1  key2
+a     1        1
+      2        4
+b     1        7
+      2       10
+Name: (Ohio, Red), dtype: int32
+
+```
+
+可以直接创建多层索引
+
+```python
+n [104]: MultiIndex.from_arrays([['Ohio', 'Ohio', 'Colorado'], ['Gree', 'Red','Green']],
+    ...:                              names = ['state', 'color'])
+ut[104]:
+ultiIndex(levels=[[u'Colorado', u'Ohio'], [u'Gree', u'Green', u'Red']],
+          labels=[[1, 1, 0], [0, 2, 1]],
+          names=[u'state', u'color'])
+```
+
+#### 重排分级顺序
+
+swapleve接受两个级别编号或者名称，返回一个互换了级别的对象，但数据不变
+
+sortlevel根据单个级别中的值对数据排序
+
+```python
+In [105]: frame
+Out[105]:
+state      Ohio     Colorado
+color     Green Red    Green
+key1 key2
+a    1        0   1        2
+     2        3   4        5
+b    1        6   7        8
+     2        9  10       11
+
+In [106]: frame_swapped = frame.swaplevel('key1', 'key2');frame_swapped
+Out[106]:
+state      Ohio     Colorado
+color     Green Red    Green
+key2 key1
+1    a        0   1        2
+2    a        3   4        5
+1    b        6   7        8
+2    b        9  10       11
+
+In [107]: frame_swapped.swaplevel(0, 1)
+Out[107]:
+state      Ohio     Colorado
+color     Green Red    Green
+key1 key2
+a    1        0   1        2
+     2        3   4        5
+b    1        6   7        8
+     2        9  10       11
+    
+In [108]: frame.sortlevel(1)
+Out[108]:
+state      Ohio     Colorado
+color     Green Red    Green
+key1 key2
+a    1        0   1        2
+b    1        6   7        8
+a    2        3   4        5
+b    2        9  10       11
+```
+
+#### 根据级别汇总
+
+```python
+In [109]: frame.sum(level="key2")
+Out[109]:
+state  Ohio     Colorado
+color Green Red    Green
+key2
+1         6   8       10
+2        12  14       16
+
+In [110]: frame.sum(level="color", axis=1)
+Out[110]:
+color      Green  Red
+key1 key2
+a    1         2    1
+     2         8    4
+b    1        14    7
+     2        20   10
+```
+
+#### 使用DataFrame的列
+
+DataFrame的set_index函数会将其中一个或者多个列转换为行索引，并创建一个新的DataFrame
+
+参数drop=False可以保留列
+
+reset_index跟set_index相反，层次化索引的级别会被移到列中
+
+```python
+In [111]: frame = DataFrame({'a':range(7),
+     ...:                    'b':range(7, 0, -1),
+     ...:                    'c':['one', 'one', 'one', 'two', 'two', 'two', 'two'],
+     ...:                    'd':[0, 1, 2, 0, 1, 2, 3]})
+
+In [112]: frame
+Out[112]:
+   a  b    c  d
+0  0  7  one  0
+1  1  6  one  1
+2  2  5  one  2
+3  3  4  two  0
+4  4  3  two  1
+5  5  2  two  2
+6  6  1  two  3
+
+In [113]: frame.set_index(['c', 'd'])
+Out[113]:
+       a  b
+c   d
+one 0  0  7
+    1  1  6
+    2  2  5
+two 0  3  4
+    1  4  3
+    2  5  2
+    3  6  1
+# 保留列drop=False
+In [114]: frame.set_index(['c', 'd'], drop=False)
+Out[114]:
+       a  b    c  d
+c   d
+one 0  0  7  one  0
+    1  1  6  one  1
+    2  2  5  one  2
+two 0  3  4  two  0
+    1  4  3  two  1
+    2  5  2  two  2
+    3  6  1  two  3
+    
+In [115]: frame2 = frame.set_index(['c', 'd'])
+# 层次索引还原到列中
+In [116]: frame2.reset_index()
+Out[116]:
+     c  d  a  b
+0  one  0  0  7
+1  one  1  1  6
+2  one  2  2  5
+3  two  0  3  4
+4  two  1  4  3
+5  two  2  5  2
+6  two  3  6  1
+```
+
+### 其他话题
+
+#### 整数索引
+
+使用整数索引会产生歧义。
+
+我们不知道用户想要什么，是基于标签还是位置的索引
+
+```python
+In [117]: ser = Series(np.arange(3.))
+
+In [118]: ser[-1]
+```
+
+非整数索引，没有歧义，一定是基于位置的了。
+
+```python
+In [119]: ser2 = Series(np.arange(3.), index = ['a', 'b', 'c'])
+
+In [120]: ser2[-1]
+Out[120]: 2.0
+```
+
+**为了保持一致，根据整数进行数据选取的时候，总是面向标签的，包括ix进行切片**
+
+```python
+In [121]: ser
+Out[121]:
+0    0.0
+1    1.0
+2    2.0
+dtype: float64
+
+In [122]: ser.ix[:1]
+Out[122]:
+0    0.0
+1    1.0
+dtype: float64
+```
+
+如果需要可靠的，不考虑索引类型的、基于位置的索引，用series的和dataframe的iloc方法
+
+```python
+In [136]: ser
+Out[136]:
+0    0.0
+1    1.0
+2    2.0
+dtype: float64
+
+In [137]: ser.iloc[-1]
+Out[137]: 2.0
+
+In [127]: frame = DataFrame(np.arange(6).reshape((3, 2)), index = [2, 0, 1])
+
+In [128]: frame
+Out[128]:
+   0  1
+2  0  1
+0  2  3
+1  4  5
+
+In [130]: frame.iloc[0]
+Out[130]:
+0    0
+1    1
+Name: 2, dtype: int32
+
+In [131]: frame.iloc[:,1]
+Out[131]:
+2    1
+0    3
+1    5
+Name: 1, dtype: int32
+
+```
+
+#### 面板数据
+
+pandas有个一Panel数据结构，可以看做是三维的DataFrame
+
+Panel的每一项都是DataFrame
+
+访问顺序：Items -> Major -> Minor
+
+```python
+start = datetime.datetime(2016, 1, 1)
+end = datetime.datetime(2017, 1, 1)
+stks = ['IBM', 'MSFT', 'GOOG']
+pdata = Panel(dict((stk, web.DataReader(stk, "yahoo", start, end)) for stk in stks))
+
+In [143]: pdata
+Out[143]:
+<class 'pandas.core.panel.Panel'>
+Dimensions: 3 (items) x 252 (major_axis) x 6 (minor_axis)
+Items axis: GOOG to MSFT
+Major_axis axis: 2016-01-04 00:00:00 to 2016-12-30 00:00:00
+Minor_axis axis: Open to Adj Close
+
+# 交换 items 和 minor
+In [144]: pdata = pdata.swapaxes('items', 'minor')
+
+In [145]: pdata
+Out[145]:
+<class 'pandas.core.panel.Panel'>
+Dimensions: 6 (items) x 252 (major_axis) x 3 (minor_axis)
+Items axis: Open to Adj Close
+Major_axis axis: 2016-01-04 00:00:00 to 2016-12-30 00:00:00
+Minor_axis axis: GOOG to MSFT
+    
+# 访问某一项
+In [147]: pdata['Adj Close'].head()
+Out[147]:
+                  GOOG         IBM       MSFT
+Date
+2016-01-04  741.840027  129.932320  53.015032
+2016-01-05  742.580017  129.836755  53.256889
+2016-01-06  743.619995  129.186847  52.289462
+2016-01-07  726.390015  126.979099  50.470697
+2016-01-08  714.469971  125.803548  50.625489
+
+# ix访问三个维度
+In [148]: pdata[:, '1/5/2016', :]
+Out[148]:
+            Open        High         Low       Close      Volume   Adj Close
+GOOG  746.450012  752.000000  738.640015  742.580017   1950700.0  742.580017
+IBM   136.759995  136.889999  134.850006  135.850006   3924800.0  129.836755
+MSFT   54.930000   55.389999   54.540001   55.049999  34079700.0   53.256889
+
+In [149]: pdata['Adj Close', '1/6/2016', :]
+Out[149]:
+GOOG    743.619995
+IBM     129.186847
+MSFT     52.289462
+Name: 2016-01-06 00:00:00, dtype: float64
+                
+# Panel与DataFrame相互转换
+In [151]: stacked = pdata.ix[:, '1/7/2016':, :].to_frame();stacked.head()
+Out[151]:
+                        Open        High         Low       Close      Volume  \
+Date       minor
+2016-01-07 GOOG   730.309998  738.500000  719.059998  726.390015   2963700.0
+           IBM    133.699997  135.020004  132.429993  132.860001   7025800.0
+           MSFT    52.700001   53.490002   52.070000   52.169998  56564900.0
+2016-01-08 GOOG   731.450012  733.229980  713.000000  714.469971   2450900.0
+           IBM    133.179993  133.820007  131.320007  131.630005   4762700.0
+
+                   Adj Close
+Date       minor
+2016-01-07 GOOG   726.390015
+           IBM    126.979099
+           MSFT    50.470697
+2016-01-08 GOOG   714.469971
+           IBM    125.803548
+
+# 再还原回来
+In [152]: stacked.to_panel()
+Out[152]:
+<class 'pandas.core.panel.Panel'>
+Dimensions: 6 (items) x 249 (major_axis) x 3 (minor_axis)
+Items axis: Open to Adj Close
+Major_axis axis: 2016-01-07 00:00:00 to 2016-12-30 00:00:00
+Minor_axis axis: GOOG to MSFT
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
