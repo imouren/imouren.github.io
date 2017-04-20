@@ -41,6 +41,7 @@ conda install numpy
 conda install scipy
 conda install pandas
 conda install matplotlib
+conda install pandas-datareader
 ```
 
 ### Numpy
@@ -56,18 +57,18 @@ conda install matplotlib
 *   可以直接对数组的每个元素进行操作
 
     ```python
-      In [1]: import numpy as np
+        In [1]: import numpy as np
 
-      In [2]: np.arange(10)
-      Out[2]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        In [2]: np.arange(10)
+        Out[2]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-      In [3]: a = _
+        In [3]: a = _
 
-      In [4]: a ** 2
-      Out[4]: array([ 0,  1,  4,  9, 16, 25, 36, 49, 64, 81])
+        In [4]: a ** 2
+        Out[4]: array([ 0,  1,  4,  9, 16, 25, 36, 49, 64, 81])
     ```
 
-      ​
+        ​
 
 ### Scipy
 
@@ -378,11 +379,11 @@ array([[[ 0.,  0.],
 *    数组与标量的算术运算也会将那个标量的值传播到各个元素
 
      ```python
-     In [62]: arr = np.array([[1.0, 2.0, 3.0], [4., 5., 6.]])
+        In [62]: arr = np.array([[1.0, 2.0, 3.0], [4., 5., 6.]])
 
-     In [63]: arr * arr
-     Out[63]:
-     array([[  1.,   4.,   9.],
+        In [63]: arr * arr
+        Out[63]:
+        array([[  1.,   4.,   9.],
      [ 16.,  25.,  36.]])
      ```
 
@@ -1703,7 +1704,6 @@ Out[44]:
 2  2002    Ohio  3.6
 3  2001  Nevada  2.4
 4  2002  Nevada  2.9
-
 ```
 
 如果传入的列在数据中找不到，则产生NA值
