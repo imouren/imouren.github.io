@@ -42,6 +42,9 @@ conda install scipy
 conda install pandas
 conda install matplotlib
 conda install pandas-datareader
+conda install --channel https://conda.anaconda.org/menpo opencv3
+conda install PIL
+conda install scikit-image
 ```
 
 ### Numpy
