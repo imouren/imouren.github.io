@@ -36,6 +36,17 @@ linux:
 git config http.postBuffer 524288000
 ```
 
+## 取消跟踪
+
+
+取消跟踪文件
+
+`git rm --cached FILENAME`
+
+取消跟踪目录
+
+`git rm --cached FILENAME -r`
+
 ## 生成密钥（windows）
 
 查看密钥
