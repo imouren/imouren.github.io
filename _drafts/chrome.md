@@ -6,4 +6,5 @@
 * 店查查
 * image size info
 * resize window
-* ​
+* ​json-handle
+* 惠惠

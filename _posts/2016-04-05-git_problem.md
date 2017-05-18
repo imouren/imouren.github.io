@@ -139,5 +139,8 @@ url = ssh://git@code.funshion.com:88888/japan/thor_crystal.git
 ```
 
 
+## 合并其他版本的部分文件
 
-
+```python
+git checkout source_branch <paths>...
+```
