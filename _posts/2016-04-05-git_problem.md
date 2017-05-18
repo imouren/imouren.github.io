@@ -144,3 +144,9 @@ url = ssh://git@code.funshion.com:88888/japan/thor_crystal.git
 ```python
 git checkout source_branch <paths>...
 ```
+
+## github 误提交大文件解决
+
+```python
+git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch FOLDERNAME" -- --all
+```
