@@ -335,6 +335,15 @@ def decompress(string):
   except Exception, error:
     raise
 
+# 用这个
+def decompress(string):
+    try:
+        pipe = Popen([LZOP, '--decompress', '--stdout'], stdin=PIPE, stdout=PIPE)
+        output = pipe.communicate(input=string)[0]
+        return output
+    except Exception:
+        raise
+
 if __name__ == '__main__':
   s = 'asdfasdf'
   c = compress(s)
