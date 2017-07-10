@@ -136,7 +136,7 @@ wget "http://api-vmis.xxx.xx/list/?fudid=3d6118bc04c605c6e8c506c6e7ab70655f75d58
 查看系统glibc支持的版本
 
 ```python
-strings /lib64/libc.so.6 |grep GLIBC_ 
+strings /lib64/libc.so.6 |grep GLIBC_
 
 rpm -qa |grep glibc
 ```
@@ -147,3 +147,8 @@ rpm -qa |grep glibc
 http://ftp.gnu.org/gnu/glibc/
 ```
 
+## 查看请求某个URL用时多久
+
+```python
+curl -so/dev/null baidu.com -w "%{time_total}\n"
+```

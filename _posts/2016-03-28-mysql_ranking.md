@@ -38,7 +38,7 @@ ORDER BY FIELD(name, 'B', 'A', 'D', 'E', 'C')
 
 ```python
 # 得到全部数据的sum(disable)
-select sum(disable) from fv_video order by create_time desc limit 100000; 
+select sum(disable) from fv_video order by create_time desc limit 100000;
 
 select sum(disable) from (select disable from fv_video order by create_time desc limit 100000) a;
 ```
@@ -53,7 +53,7 @@ SELECT * FROM fun_theme_content WHERE id >= ((SELECT MAX(id) FROM fun_theme_cont
 
 ## varchar 查询 = 0
 
-``python
+```python
 select * from table_xx where varchar_filed = 0;
 查询出来的结果，并不是varchar_filed为 '0' 的。
 
