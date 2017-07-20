@@ -332,6 +332,23 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 ```
 
+## 字段增加链接
+
+```python
+
+class AlbumProgramRelateAdmin(admin.ModelAdmin):
+    list_display = ["album", "programx", "period", "area_group", "number", "percent", "priority"]
+    fields = list_display
+    list_filter = ["album", ]
+    search_fields = ["album__album_name", "program__program_name"]
+
+    def programx(self, obj):
+        return '<a href="/admin/gotyou2/program/?program_id=%s" target="_blank">%s</a>' % (obj.program.program_id, obj.program)
+    programx.allow_tags = True
+    programx.short_description = u'策略'
+
+```
+
 ## 不用many2many实现多选框
 
 https://github.com/kelvinwong-ca/django-select-multiple-field
