@@ -2802,3 +2802,28 @@ redis-benchmark -h 127.0.0.1 -p 6379 -t set,lpush -n 100000 -q
 {% endhighlight %}
 
 http://www.tutorialspoint.com/redis/redis_benchmarks.htm
+
+
+## 数据导入导出
+
+```python
+
+# 安装redis-dump
+yum install ruby rubygems ruby-devel   //安装rubygems 以及相关包
+gem sources --add http://upyun.gems.ruby-china.org/
+gem sources -l
+gem sources --remove http://rubygems.org/
+gem install redis-dump -V
+
+# redis-dump 导出数据
+redis-dump –u 127.0.0.1:6379 > test.json (导出redis 默认数据库的数据，默认数据库为0)
+如果指定15数据库的数据：
+redis-dump –u 127.0.0.1:6379 –d 15 >test.json
+
+# redis-load 还原数据
+cat test.json | redis-load
+如果导出时指定了数据库
+cat test.json | redis-load –d 15
+
+
+```
