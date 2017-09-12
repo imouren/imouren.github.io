@@ -2825,5 +2825,22 @@ cat test.json | redis-load
 如果导出时指定了数据库
 cat test.json | redis-load –d 15
 
+# key多的话，报错。。。。。方案舍弃
+```
+
+直接存rdb
+
+```python
+
+CONFIG GET dir
+
+BGSAVE
+
+
+stop redis server
+
+copy the dump.rdb to target host
+
+start redis server
 
 ```
