@@ -9,6 +9,12 @@ tags:  python
 * content
 {:toc}
 
+## 不打印警告信息
+
+```python
+import warnings
+warnings.filterwarnings("ignore")
+```
 
 
 ## 数字格式化为百分百

@@ -2539,9 +2539,9 @@ Sentinel 使用以下规则来选择新的主服务器：
 isKeyExists = EXISTS rate:limiting:IP
 if isKeyExists:
     times = INCR rate:limiting:IP
-if times > 100:
-    print "deny!"
-    exit
+    if times > 100:
+        print "deny!"
+        exit
 else:
     INCR rate:limiting:IP
     EXPIRE rate:limiting:IP 60
@@ -2556,9 +2556,9 @@ else:
 isKeyExists = EXISTS rate:limiting:IP
 if isKeyExists:
     times = INCR rate:limiting:IP
-if times > 10:
-    print "deny!"
-    exit
+    if times > 10:
+        print "deny!"
+        exit
 else:
     MULTI
     INCR rate:limiting:IP
@@ -2592,13 +2592,12 @@ if listLength < 10:
     LPUSH rate:limiting:IP now()
 else:
     time = LINDEX rate:limiting:IP -1
-
-if now() - time < 60:
-    print "deny!"
-    exit
-else:
-    LPUSH rate:limiting:IP now()
-    LTRIM rate:limiting:IP 0 9
+    if now() - time < 60:
+        print "deny!"
+        exit
+    else:
+        LPUSH rate:limiting:IP now()
+        LTRIM rate:limiting:IP 0 9
 
 
 {% endhighlight %}
