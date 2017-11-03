@@ -178,3 +178,62 @@ class AESCipher(object):
     def _unpad(s):
         return s[:-ord(s[len(s)-1:])]
 ```
+
+
+## 线程池
+
+```python
+
+import time
+import functools
+from multiprocessing.dummy import Pool as ThreadPool
+
+
+def clock(func):
+    @functools.wraps(func)
+    def clocked(*args, **kwargs):
+        t0 = time.time()
+        result = func(*args, **kwargs)
+        elapsed = time.time() - t0
+        name = func.__name__
+        arg_lst = []
+        if args:
+            arg_lst.append(', '.join(repr(arg) for arg in args))
+        if kwargs:
+            pairs = ['%s=%r' % (k, w) for k, w in sorted(kwargs.items())]
+            arg_lst.append(', '.join(pairs))
+        arg_str = ', '.join(arg_lst)
+        print('[%0.8fs] %s(%s) -> %r ' % (elapsed, name, arg_str, result))
+        return result
+    return clocked
+
+
+def io_heavy(n):
+    time.sleep(0.5)
+    return n ** 2
+
+
+@clock
+def parallel_func(numbers, threads=2):
+    pool = ThreadPool(threads)
+    results = pool.map(io_heavy, numbers)
+    pool.close()
+    pool.join()
+    return results
+
+
+@clock
+def func(numbers):
+    results = []
+    for n in numbers:
+        results.append(io_heavy(n))
+    return results
+
+
+if __name__ == "__main__":
+    numbers = [1, 2, 3, 4, 5]
+    parallel_result = parallel_func(numbers, 4)
+    func_result = func(numbers)
+    print parallel_result == func_result
+
+```
