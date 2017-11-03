@@ -1,7 +1,7 @@
 @font-face {
    font-family: 'Wawa';
    src: url('../fonts/wawa.eot'); /* IE9 Compat Modes */
-   src: url('../fonts/wawa.woff') format('woff'), /* Modern Browsers */
+   src: /* url('../fonts/wawa.woff') format('woff'),  Modern Browsers */
        url('../fonts/wawa.ttf')  format('truetype'); /* Safari, Android, iOS */
 }
 body {
