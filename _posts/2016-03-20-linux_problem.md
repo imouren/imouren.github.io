@@ -147,6 +147,9 @@ rpm -qa |grep glibc
 http://ftp.gnu.org/gnu/glibc/
 ```
 
+误删libc.so.6的解决方案，一定不要关闭会话，一定保留一个root的会话窗口
+LD_PRELOAD=/lib64/libc-2.5.so ln -s /lib64/libc-2.5.so /lib64/libc.so.6
+
 ## 查看请求某个URL用时多久
 
 ```python
