@@ -284,3 +284,10 @@ if __name__ == '__main__':
 
 pyinstaller -F pyfile.py
 ```
+
+### 访问局域网文件
+
+```python
+with open('\\\\FX-JSJ510\\vmis_pic\\filename', 'wb') as f:
+    process_some(f)
+```
