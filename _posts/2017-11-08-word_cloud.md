@@ -11,6 +11,7 @@ tags:  python
 
 ## 生成云图
 
+```python
 # -*- coding: utf-8 -*-
 from wordcloud import WordCloud
 import cPickle as pickle
