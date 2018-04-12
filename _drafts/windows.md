@@ -31,3 +31,7 @@
 ### cmder 中文显示
 
 在Settings > Startup > Environment里添加：set LANG=zh_CN.UTF8
+
+### chrome
+
+* postman

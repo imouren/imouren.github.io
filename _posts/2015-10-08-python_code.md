@@ -291,3 +291,14 @@ pyinstaller -F pyfile.py
 with open('\\\\FX-JSJ510\\vmis_pic\\filename', 'wb') as f:
     process_some(f)
 ```
+
+## 读取图片
+
+```python
+import requests as req
+from PIL import Image
+from io import BytesIO
+response = req.get(img_src)
+image = Image.open(BytesIO(response.content))
+image.show()
+```

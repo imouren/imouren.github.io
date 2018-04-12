@@ -359,6 +359,10 @@ django-smart-selects
 
 https://github.com/digi604/django-smart-selects
 
+## django-select2
+
+https://github.com/asyncee/django-easy-select2
+
 ## django admin 模板
 
 参考
@@ -369,10 +373,39 @@ https://github.com/rosarior/awesome-django
 
 列出前几个
 
+https://github.com/divio/djangocms-admin-style
+
 https://github.com/sehmaschine/django-grappelli
 
 https://github.com/django-admin-bootstrapped/django-admin-bootstrapped
 
-https://github.com/darklow/django-suit
+https://github.com/darklow/django-suit (选用的这个)
+https://github.com/django-ckeditor/django-ckeditor (富文本编辑器用这个)
+
+django-image-cropping easy_thumbnails 图片的好使的
+https://github.com/divio/django-filer
+versatileimagefield (未测试)
 
 
+## django 查看sql语句
+
+```python
+qs.query.__str__()
+
+Video.objects.values("topic").annotate(total=Count('topic'))
+有默认排序的需要自己加个排序，否则会自动加上自动排序的
+Video.objects.values("topic").annotate(total=Count('topic')).order_by("topic")
+```
+
+## django admin 字符串转数字排序
+
+```python
+class XAdmin(admin.ModelAdmin):
+    list_display = ['trade_rmb']
+    list_filter = []
+
+    def get_queryset(self, request):
+        queryset = super(SYFTerminalAdmin, self).get_queryset(request)
+        queryset = queryset.extra({'trade_rmb': "CAST(trade_rmb as DECIMAL)"})
+        return queryset
+```

@@ -4,6 +4,14 @@
 
 * [下载地址](https://www.continuum.io/downloads)
 
+* 删除虚拟环境。
+
+   使用命令conda remove -n your_env_name(虚拟环境名称) --all， 即可删除。
+
+* 删除环境中的某个包。
+
+   使用命令conda remove --name $your_env_name  $package_name 即可。
+
 * 命令行创建和启动
 
   `conda create --name py27 python=2.7`
@@ -11,6 +19,8 @@
   `activate py27`
 
 * 列出安装的包 `conda list` `conda list -n py27`
+
+* conda info --envs
 
 * 安装新包 `conda install numpy` （会安装和更新库所依赖的各种库）
 
@@ -25,7 +35,7 @@
   ```python
   # 添加Anaconda的TUNA镜像
   conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
-   
+
   # 设置搜索时显示通道地址
   conda config --set show_channel_urls yes
   ```
@@ -317,7 +327,7 @@ Numpy是python的一个扩展库。支持高级大量的维度与矩阵运算，
 In [47]: alist = range(10)
 In [48]: arr = np.array(alist); arr, arr.dtype, arr.shape
 Out[48]: (array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), dtype('int32'), (10L,))
-    
+
 In [49]: data = [[1, 2, 3, 4], [5, 6, 7, 8]]
 
 In [50]: arr2 = np.array(data);arr2, arr2.dtype, arr2.shape
@@ -646,7 +656,7 @@ array([[[ 0.,  0.],
 
   In [125]: arr[[1,5,7,2],[0,3,1,2]]  # 选取(1,0) (5,3) (7,2) (2,2)位置的元素
   Out[125]: array([ 4, 23, 29, 10])
-   
+
   # 矩形区域方式一
   In [126]: arr[[1,5,7,2]][:,[0,3,1,2]]
   Out[126]:
@@ -796,7 +806,7 @@ array([[[ 0.,  0.],
   In [150]: x = np.random.randn(8)
 
   In [151]: y = np.random.randn(8)
-      
+
   In [153]: np.maximum(x, y)
   Out[153]:
   array([ 0.51955399,  0.50244785,  1.50765635,  1.57184637, -0.07270351,
@@ -838,7 +848,7 @@ array([[[ 0.,  0.],
   plt.imshow(z, cmap = plt.cm.gray);
   plt.colorbar()
   plt.title("Image plot of $\sqrt{x^2 + y^2}$ for a grid of values")
-  pylab.show() 
+  pylab.show()
 ```
 
   ### 将条件逻辑表述为数组运算
@@ -1046,19 +1056,19 @@ array([[  28.,   64.],
 # 一个二维数组跟一个大小合适的一维数组的矩阵点积运算之后得到一个一维数组
 In [220]: np.dot(x, np.ones(3))
 Out[220]: array([  6.,  15.])
-    
+
 In [263]: from numpy.linalg import inv, qr
 
 In [265]: X = np.random.randn(5,5)
 
-In [266]: mat = X.T.dot(X) # 
+In [266]: mat = X.T.dot(X) #
 
 In [268]: inv(mat)  # 矩阵求逆
- 
+
 In [269]: mat.dot(inv(mat))  # 与逆矩阵相乘，得到单位矩阵
-    
+
 In [270]: q,r=qr(mat)  # 矩阵消元
-    
+
 # 求解线性方程
 In [353]: a = np.array([[3,1], [1,2]])
 
@@ -1134,7 +1144,7 @@ Out[245]: -18
 
 In [246]: walk.max()
 Out[246]: 9
-    
+
 # 首次穿越时间，第一次穿越5的时间，用argmax来解决，返回的是布尔型数组第一个最大值的索引。
 In [250]: (np.abs(walk) >= 5).argmax()
 Out[250]: 6
@@ -1448,13 +1458,13 @@ Out[342]: array([700, 100, 200, 600])
 # 使用take
 In [343]: arr.take(inds)
 Out[343]: array([700, 100, 200, 600])
-   
+
 # put修改数据
 In [344]: arr.put(inds, [40,41,42,43])
 
 In [345]: arr
 Out[345]: array([  0,  41,  42, 300, 400, 500,  43,  40, 800, 900])
-    
+
 # 如果要在其他轴使用take，传入axis关键字即可
 In [346]: inds = [2,0,2,1]
 
@@ -1473,7 +1483,7 @@ array([[-0.19948325,  0.07588051, -0.19948325, -1.01561382],
 
 
 
-## Pandas 
+## Pandas
 
 pandas = panel data + data analysis
 
@@ -1510,13 +1520,13 @@ Out[6]:
 2   -5
 3    3
 dtype: int64
-    
+
 In [7]: obj.values
 Out[7]: array([ 4,  7, -5,  3], dtype=int64)
 
 In [8]: obj.index
 Out[8]: RangeIndex(start=0, stop=4, step=1)
-    
+
 # 指定索引
 In [9]: obj2 = Series([4,7,-5,3], index=list('dbac'))
 
@@ -1548,7 +1558,7 @@ c    3
 a   -5
 d    6
 dtype: int64
-    
+
 In [15]: obj2[obj2 > 0]
 Out[15]:
 d    6
@@ -1601,7 +1611,7 @@ Ohio          35000.0
 Oregon        16000.0
 Texas         71000.0
 dtype: float64
-    
+
 # 缺失值的判断
 In [24]: obj4.isnull()
 Out[24]:
@@ -1896,7 +1906,7 @@ __setitem__(self, key, value)
    1406     def __getitem__(self, key):
 
 TypeError: Index does not support mutable operations
-    
+
 # 索引共享
 In [74]: index = Index(np.arange(3))
 
@@ -2424,8 +2434,8 @@ Ohio      2.701557
 Texas     0.958743
 Oregon    1.750782
 dtype: float64
-    
-    
+
+
 In [148]: def f(x):
      ...:     return Series([x.min(), x.max()], index = ['min', 'max'])
      ...:
@@ -2518,7 +2528,7 @@ Out[160]:
 0    4
 1    7
 dtype: int64
-    
+
 # dataframe
 In [162]: frame = DataFrame({'b':[4, 7, -3, 2], 'a':[0, 1, 0, 1]});frame
 Out[162]:
@@ -2589,7 +2599,7 @@ Out[168]:
 5    6.0
 6    4.0
 dtype: float64
-    
+
 # dataframe
 In [170]: frame = DataFrame({'b':[4.3, 7, -3, 2],
      ...:                   'a':[0, 1, 0, 1],
@@ -2633,7 +2643,7 @@ dtype: int64
 
 In [174]: obj.index.is_unique
 Out[174]: False
-    
+
 In [177]: obj['a']
 Out[177]:
 a    0
@@ -2699,7 +2709,7 @@ b    2.60
 c     NaN
 d   -0.55
 dtype: float64
-    
+
 # 使用skipna参数
 In [188]: df.mean(axis=1, skipna=False)
 Out[188]:
@@ -2867,7 +2877,7 @@ a    3
 b    2
 d    1
 dtype: int64
-# 成员资格    
+# 成员资格
 In [51]: mask = obj.isin(['b', 'c']);mask
 Out[51]:
 0     True
@@ -3277,7 +3287,7 @@ a    1        0   1        2
      2        3   4        5
 b    1        6   7        8
      2        9  10       11
-    
+
 In [108]: frame.sortlevel(1)
 Out[108]:
 state      Ohio     Colorado
@@ -3358,7 +3368,7 @@ two 0  3  4  two  0
     1  4  3  two  1
     2  5  2  two  2
     3  6  1  two  3
-    
+
 In [115]: frame2 = frame.set_index(['c', 'd'])
 # 层次索引还原到列中
 In [116]: frame2.reset_index()
@@ -3482,7 +3492,7 @@ Dimensions: 6 (items) x 252 (major_axis) x 3 (minor_axis)
 Items axis: Open to Adj Close
 Major_axis axis: 2016-01-04 00:00:00 to 2016-12-30 00:00:00
 Minor_axis axis: GOOG to MSFT
-    
+
 # 访问某一项
 In [147]: pdata['Adj Close'].head()
 Out[147]:
@@ -3508,7 +3518,7 @@ GOOG    743.619995
 IBM     129.186847
 MSFT     52.289462
 Name: 2016-01-06 00:00:00, dtype: float64
-                
+
 # Panel与DataFrame相互转换
 In [151]: stacked = pdata.ix[:, '1/7/2016':, :].to_frame();stacked.head()
 Out[151]:

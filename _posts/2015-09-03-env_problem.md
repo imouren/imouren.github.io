@@ -16,7 +16,7 @@ tags:  linux
 yum groupinstall "Development Tools"
 yum install gtk+-devel gtk2-devel
 
-yum install openssl openssl-devel -y
+yum install openssl openssl-devel postgresql-devel -y
 yum install sqlite-devel libffi-devel libxslt-devel -y
 yum install libjpeg-devel freetype-devel -y
 
@@ -37,6 +37,8 @@ yum install cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-md5 cyrus-sasl-plain -
 yum install screen -y
 
 yum install lzo-devel -y
+
+yum -y install python-pip
 ```
 
 ## python 安装 readline错误

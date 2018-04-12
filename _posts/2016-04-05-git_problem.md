@@ -36,6 +36,19 @@ linux:
 git config http.postBuffer 524288000
 ```
 
+## 删除文件
+
+windows下删除pyc
+
+for /r ./ %i in (*.pyc) do del %i
+
+将删除同步给git
+git add -A
+
+git commit -a -m "del pyc"
+
+
+
 ## 取消跟踪
 
 

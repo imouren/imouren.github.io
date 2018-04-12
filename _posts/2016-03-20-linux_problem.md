@@ -297,3 +297,14 @@ svctm
 一秒中有百分之多少的时间用于I/O操作，或者说一秒中有多少时间I/O队列是非空的。
 
 ```
+
+## 禁用ping
+
+```python
+禁用
+echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+启用
+echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+```
