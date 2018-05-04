@@ -39,7 +39,7 @@ date_hierarchy = 'publication_date'
 
 list_display_links = None
 
-## 不显示 删除 的action
+## 不显示 删除 的actionf
 
 ```python
 
@@ -409,3 +409,10 @@ class XAdmin(admin.ModelAdmin):
         queryset = queryset.extra({'trade_rmb': "CAST(trade_rmb as DECIMAL)"})
         return queryset
 ```
+
+
+### select_related 和 prefetch_related
+
+What's the difference between select_related and prefetch_related in Django ORM?
+
+https://stackoverflow.com/questions/31237042/whats-the-difference-between-select-related-and-prefetch-related-in-django-orm
