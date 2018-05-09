@@ -302,3 +302,35 @@ response = req.get(img_src)
 image = Image.open(BytesIO(response.content))
 image.show()
 ```
+
+
+## 上传文件
+
+html上传
+
+```python
+<form method="post" action="http://192.168.28.209:5500/update/user/avatar/" enctype="multipart/form-data">
+         <input type="text" name="user_id" value="11">
+         <input type="text" name="token" value="jLnay1D8uWu8V79hSyxapFsedhxzvOEAD9WzwG9Zu24LBb45QE2zEQ52xcEKg5OoxUcIEvWqPRGr7ujX4MHwn4y28UFWCjkd">
+         <input type="file" name="avatar">
+         <input type="submit" name="xx">
+ </form>
+```
+
+curl 上传
+
+```python
+curl -i -X POST -H "Content-Type: multipart/form-data" \
+-F "avatar=@3.jpg" \
+-F "user_id=11" \
+-F "token=jLnay1D8uWu8V79hSyxapFsedhxzvOEAD9WzwG9Zu24LBb45QE2zEQ52xcEKg5OoxUcIEvWqPRGr7ujX4MHwn4y28UFWCjkd" \
+http://192.168.28.143:5500/update/user/avatar/
+```
+
+服务器解析
+
+```python
+print request.POST
+print request.FILES
+avatar = request.FILES.get("avatar")
+```
