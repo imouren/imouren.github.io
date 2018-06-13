@@ -163,3 +163,18 @@ git checkout source_branch <paths>...
 ```python
 git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch FOLDERNAME" -- --all
 ```
+
+## 查看最新的版本号
+
+```python
+git rev-parse HEAD
+```
+
+## 回滚代码
+
+```python
+git reset --hard   22f8aae # 22f8aae 为某次提交的提交号
+
+git push origin maser --force  # 强推到远程
+```
+

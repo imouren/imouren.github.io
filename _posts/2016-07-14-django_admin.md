@@ -416,3 +416,12 @@ class XAdmin(admin.ModelAdmin):
 What's the difference between select_related and prefetch_related in Django ORM?
 
 https://stackoverflow.com/questions/31237042/whats-the-difference-between-select-related-and-prefetch-related-in-django-orm
+
+
+### django admin 搜索的匹配
+
+^ Use the ‘^’ operator to match starting at the beginning of the field
+
+= Use the ‘=’ operator for case-insensitive exact matching
+
+@ Using the ‘@’ operator to perform a full text match. This is like the default search method but uses an index
