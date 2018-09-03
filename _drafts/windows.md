@@ -35,3 +35,11 @@
 ### chrome
 
 * postman
+
+### typora
+
+
+```python
+设置字体颜色
+$\textcolor{GreenYellow}{GreenYellow} $
+```

@@ -71,3 +71,72 @@ print f.good_sentence(sentence)
 # ****o, you are a **, ****!
 
 ```
+
+
+## 一段项目中的代码
+
+```python
+# -*- coding: utf-8 -*-
+import threading
+from content.dbutils import get_black_words
+
+RELOAD_TIME = 1800
+
+
+class Filter(object):
+
+    def __init__(self):
+        self.init()
+
+    def init(self):
+        self.maxlength = 0
+        self.dicts = {}
+        self.first = {}
+        self.others = {}
+
+    def good_sentence(self, sentence):
+        for index, char in enumerate(sentence):
+            if char not in self.first:
+                continue
+            for j in xrange(min(self.maxlength, len(sentence) - index)):
+                if j != 0 and sentence[index + j] not in self.others:
+                    break
+                word = sentence[index:index + j + 1]
+                if word in self.dicts:
+                    sentence = sentence.replace(word, "*" * len(word))
+        return sentence
+
+    def load_black_words(self, words):
+        for word in words:
+            self.maxlength = max(self.maxlength, len(word))
+            if word and word not in self.dicts:
+                self.dicts[word] = None
+                self.first[word[0]] = None
+                for char in word[1:]:
+                    self.others[char] = None
+
+    def delete_black_words(self, words):
+        for word in words:
+            if word and word in self.dicts:
+                self.dicts.pop(word)
+
+    def reload_black_words(self, words):
+        self.init()
+        self.load_black_words(words)
+
+
+sentence_filter = Filter()
+sentence_filter.load_black_words(get_black_words())
+
+
+def auto_load_words():
+    global timer
+    sentence_filter.load_black_words(get_black_words())
+    timer = threading.Timer(RELOAD_TIME, auto_load_words)
+    timer.start()
+
+
+timer = threading.Timer(RELOAD_TIME, auto_load_words)
+timer.start()
+
+```

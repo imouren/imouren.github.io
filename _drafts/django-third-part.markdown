@@ -27,3 +27,20 @@ categories: django
 * python-cjson
 * mmhash
 * lxml
+
+
+## 没有用过的
+
+全文检索
+
+haystack
+http://www.haystacksearch.org/
+
+whoosh
+http://whoosh.readthedocs.io/en/latest/quickstart.html
+
+pip install whoosh
+pip install jieba
+pip install django-haystack
+
+
