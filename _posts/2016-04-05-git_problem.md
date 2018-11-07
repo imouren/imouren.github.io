@@ -178,3 +178,12 @@ git reset --hard   22f8aae # 22f8aae 为某次提交的提交号
 git push origin maser --force  # 强推到远程
 ```
 
+## 提交到多个项目
+
+参考 https://www.cnblogs.com/mafly/p/4639572.html?utm_source=tuicool&utm_medium=referral
+
+```python
+git remote set-url --add origin git@code.xx.com:malaysia/your.git
+
+git push -f origin master # 首次强制提交
+```

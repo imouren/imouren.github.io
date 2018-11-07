@@ -63,5 +63,5 @@ select * from table_xx where varchar_filed = 0;
 当比较数字和varchar时，mysql会把varchar转换为数字，首字符为数字0的，或者其他字符的都会转换为0，varchar类型字段=0 只能排除首字符为非零数字的字符串
 
 
-
-
+## 统一修改某个表的字段编码
+alter table tab_name convert to character set utf8;

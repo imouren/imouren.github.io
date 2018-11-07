@@ -397,6 +397,19 @@ Video.objects.values("topic").annotate(total=Count('topic'))
 Video.objects.values("topic").annotate(total=Count('topic')).order_by("topic")
 ```
 
+##  group by distinct
+
+```python
+result3 = qs.values("user_id").annotate(video_num=Count('video_id'), deals_num=Count('topic_id', distinct=True))
+```
+
+## 更新 字段
+
+```
+from django.db.models import F
+tasks = Task.objects.filter(task_definition__cascades=False).update(shared_task_id=F('id'))
+```
+
 ## django admin 字符串转数字排序
 
 ```python

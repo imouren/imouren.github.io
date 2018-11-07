@@ -5,6 +5,9 @@
 创建单独的安装环境
 
 ```python
+执行Python出现LookupError: unknown encoding: cp65001错误
+chcp 936 或者 chcp 1252
+
 
 conda create --name kivy python=2.7
 activate kivy
