@@ -35,6 +35,13 @@ def datetime_to_timestamp(adatetime):
     return time.mktime(adatetime.timetuple())
 
 
+def timestamp_to_datetime(atimestamp):
+    return datetime.fromtimestamp(atimestamp)
+
+def string_to_datetime_x(time_str, format_str="%Y-%m-%d %H:%M:%S %f"):
+    return datetime.strptime(time_str, format_str)
+
+
 {% endhighlight %}
 
 

@@ -308,3 +308,12 @@ echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all
 echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_all
 
 ```
+
+## 删除有乱码的文件
+
+
+首先执行 `ls -i` 命令，此时在文件前面会出现一个数字，这个数字是文件的节点号
+
+执行下面的命令删除掉即可：
+
+find -inum 节点号 -delete
