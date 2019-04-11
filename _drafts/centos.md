@@ -34,7 +34,12 @@ yum install mysql-devel
 yum -y install python-pip
 yum install pcre pcre-devel zlib-devel zlib openssl openssl-devel -y
 
+yum install php-gd php-mbstring -y
 
+
+##
+
+wget https://www.python.org/ftp/python/2.7.12/Python-2.7.12.tgz
 
 ## ipython
 

@@ -15,6 +15,7 @@
 * listary
 * http://adkiller.360drm.com/
 * shadowsocks
+* Glary Utilities 磁盘清理等小工具
 
 ### 环境变量
 

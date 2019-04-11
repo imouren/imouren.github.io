@@ -187,3 +187,30 @@ git remote set-url --add origin git@code.xx.com:malaysia/your.git
 
 git push -f origin master # 首次强制提交
 ```
+
+
+## 代码冲突
+
+错误一：
+
+Please, commit your changes or stash them before you can merge
+
+果希望用代码库中的文件完全覆盖本地工作版本. 方法如下:
+
+```python
+git reset --hard
+git pull
+```
+
+错误二：
+
+Please move or remove them before you can merge
+
+如果确定使用云端的代码,最方便的解决方法是删除本地修改,可以使用以下命令：
+
+```python
+git clean  -d  -fx ""
+d  -----删除未被添加到git的路径中的文件
+f  -----强制运行
+x  -----删除忽略文件已经对git来说不识别的文件
+```

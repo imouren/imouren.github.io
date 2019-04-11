@@ -94,3 +94,23 @@ ldconfig
 yum install vixie-cron  crontabs -y
 
 service crond start
+
+
+## NullHandler 报错
+
+AttributeError: 'module' object has no attribute 'NullHandler'
+
+vim /usr/lib/python2.6/site-packages/stevedore/__init__.py
+
+```python
+
+try:
+    from logging import NullHandler
+except ImportError:
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+
+LOG.addHandler(NullHandler())
+
+```

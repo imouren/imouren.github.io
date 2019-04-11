@@ -59,3 +59,21 @@ if some_queryset.filter(pk=entry.pk).exists():
 video = Video.objects.select_related("user", "topic").get(pk=vid)
 ```
 
+## 随机选取元素
+
+
+```python
+
+# 直接用户数据库引擎的随机，数据大可能会慢
+def get_random():
+    return Category.objects.order_by("?").first()
+
+# 采用逻辑进行选择
+def get_random3():
+    max_id = Category.objects.all().aggregate(max_id=Max("id"))['max_id']
+    while True:
+        pk = random.randint(1, max_id)
+        category = Category.objects.filter(pk=pk).first()
+        if category:
+            return category
+```
