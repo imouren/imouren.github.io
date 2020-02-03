@@ -66,3 +66,36 @@ counts.saveAsTextFile("/test/output/spark_wordcount")
 lines = sc.textFile("file:///test/input/1.txt")
 
 ```
+
+打包python环境（未验证）
+
+```
+打包本地python环境，一定要进入目录里面
+
+
+cd path_to_python
+
+zip -r path_to_pythonzip/python_user.zip ./*
+
+hadoop fs -put python_user.zip /somepath/python_user.zip
+
+拷贝一份spark配置文件
+cd /usr/local/spark/conf
+cp spark-defaults.conf spark-user.conf
+
+添加一行配置，一定有#python
+spark.yarn.dist.archives hdfs:///somepath/python_user.zip#python
+
+提交的时候指定配置文件就可以
+
+spark-submit --master yarn \
+--properties-file /usr/local/spark/conf/spark-user.conf \
+cang_theme_program_spark.py
+```
+
+
+结束任务
+
+```
+yarn application -kill application_1450259063324_0001
+```

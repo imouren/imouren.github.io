@@ -47,6 +47,13 @@ PYSPARK_DRIVER_PYTHON=ipython  ./bin/pyspark
 PYSPARK_DRIVER_PYTHON=ipython PYSPARK_DRIVER_PYTHON_OPTS="notebook --pylab  inline" ./bin/pyspark
 ```
 
+指定python路径
+
+```
+export PYSPARK_DRIVER_PYTHON=/usr/local/python2.7/bin/python2.7
+export PYSPARK_PYTHON=/usr/local/python2.7/bin/python2.7
+```
+
 简单的行数统计
 
 ```python
@@ -54,7 +61,7 @@ PYSPARK_DRIVER_PYTHON=ipython PYSPARK_DRIVER_PYTHON_OPTS="notebook --pylab  inli
 In [1]: lines = sc.textFile("/tmp/themes")
 
 In [2]: lines.count()
-Out[2]: 127145                                                                  
+Out[2]: 127145
 
 In [3]: lines.first()
 Out[3]: u'video_id:1110079#theme_tag:\u5a31\u4e50'
@@ -215,7 +222,7 @@ In [33]: rdd1.subtract(rdd2).collect()
 Out[33]: ['tea', 'panda']
 
 In [34]: rdd1.cartesian(rdd2).collect()
-Out[34]: 
+Out[34]:
 [('coffee', 'coffee'),
  ('coffee', 'monkey'),
  ('coffee', 'kitty'),
@@ -239,7 +246,7 @@ Out[34]:
 reduce() 和 fold()
 
 fold() 类似于reduce(), 再加上一个初始值作为每个分区第一次调用的结果。
-初始值进行多次计算，不会改变结果（+对应0，*对应1，拼接操作对应[]） 
+初始值进行多次计算，不会改变结果（+对应0，*对应1，拼接操作对应[]）
 
 fold() 和 reduce() 都要求函数的返回值类型需要和我们所操作的 RDD 中的元素类型相
 同
@@ -418,7 +425,7 @@ Out[4]: [(1, 2), (3, 10)]
 
 # 对具有相同键的值进行分组
 In [8]: rdd.groupByKey().collect()
-Out[8]: 
+Out[8]:
 [(1, <pyspark.resultiterable.ResultIterable at 0x7f41b432ff50>),
  (3, <pyspark.resultiterable.ResultIterable at 0x7f41b432fd50>)]
 
@@ -431,7 +438,7 @@ Out[10]: [(1, 3), (3, 5), (3, 7)]
 
 # 对 pair RDD 中的每个值应用一个返回迭代器的函数，然后对返回的每个元素都生成一个对应原键的键值对记录。
 In [12]: rdd.flatMapValues(lambda x: range(x)).collect()
-Out[12]: 
+Out[12]:
 [(1, 0),
  (1, 1),
  (3, 0),
@@ -483,7 +490,7 @@ Out[27]: [(1, (2, None)), (3, (4, 9)), (3, (6, 9))]
 # 将两个 RDD 中拥有相同键的数据分组到一起
 
 In [58]: rdd.cogroup(other).collect()
-Out[58]: 
+Out[58]:
 [(1,
   (<pyspark.resultiterable.ResultIterable at 0x7f41b42d1110>,
    <pyspark.resultiterable.ResultIterable at 0x7f41b42abc10>)),
@@ -551,7 +558,7 @@ Out[10]: [('b', 4), ('a', 4)]
 
 在除分组操作和聚合操作之外的操作中也能改变 RDD 的分区。对于这样的情况， Spark 提供了 repartition() 函数。
 
-它会把数据通过网络进行混洗，并创建出新的分区集合。切记，对数据进行重新分区是代价相对比较大的操作。 
+它会把数据通过网络进行混洗，并创建出新的分区集合。切记，对数据进行重新分区是代价相对比较大的操作。
 
 Spark 中也有一个优化版的repartition()，叫作 coalesce()。
 
@@ -626,7 +633,7 @@ Out[46]: 100
 
 Spark 的许多操作都引入了将数据根据键跨节点进行混洗的过程。所有这些操作都会从数据分区中获益。
 
-对于二元操作，输出数据的分区方式取决于父 RDD 的分区方式。 
+对于二元操作，输出数据的分区方式取决于父 RDD 的分区方式。
 
 python 自定义分区
 
@@ -719,7 +726,7 @@ Spark的 Scala 和 Java API 中默认使用的序列化库为 Java 序列化库�
 
 基于分区对数据进行操作可以让我们避免为每个数据元素进行重复的配置工作。
 
-诸如打开数据库连接或创建随机数生成器等操作，都是我们应当尽量避免为每个元素都配置一次的工作。 
+诸如打开数据库连接或创建随机数生成器等操作，都是我们应当尽量避免为每个元素都配置一次的工作。
 
 Spark 提供基于分区 的 map 和 foreach，让你的部分代码只对 RDD 的每个分区运行一次，这样可以帮助降低这些操作的代价。
 
@@ -836,8 +843,8 @@ Out[33]: 4.5
 分布式 Spark 应用中的组件
 ![lspark_model.png](/files/lspark_model.png)
 
-Spark 应用通过一个叫作集群管理器（Cluster Manager）的外部服务在集群中的机器上启动。 
-Spark 自带的集群管理器被称为独立集群管理器。 
+Spark 应用通过一个叫作集群管理器（Cluster Manager）的外部服务在集群中的机器上启动。
+Spark 自带的集群管理器被称为独立集群管理器。
 Spark 也能运行在 Hadoop YARN 和Apache Mesos 这两大开源集群管理器上。
 
 **驱动器节点**

@@ -334,3 +334,21 @@ print request.POST
 print request.FILES
 avatar = request.FILES.get("avatar")
 ```
+
+
+## 获取StringIO大小
+
+BytesIO 也是同理
+
+```python
+import StringIO
+import os
+output = StringIO.StringIO("abcdef")
+
+position = output.tell()
+output.seek(0, os.SEEK_END)
+size = output.tell()
+output.seek(position, os.SEEK_SET)
+
+print size
+```

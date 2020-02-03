@@ -317,3 +317,17 @@ echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_all
 执行下面的命令删除掉即可：
 
 find -inum 节点号 -delete
+
+
+## ssh双层代理
+
+第一层
+
+name:44
+local:   port 4444
+remote:  一个打对勾，目标机器不同那里；hostname:192.168.8.100; port:4444
+
+跳板机上
+ssh -gD 4444 -p5044 10.1.6.45
+
+浏览器：设置 本地 4444 端口代理即可
