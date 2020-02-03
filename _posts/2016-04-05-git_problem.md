@@ -214,3 +214,37 @@ d  -----删除未被添加到git的路径中的文件
 f  -----强制运行
 x  -----删除忽略文件已经对git来说不识别的文件
 ```
+
+
+
+
+## 设置使用代理
+
+将你的proxy server地址代替以下的127.0.0.1
+
+http类型代理
+
+git config --global http.proxy http://127.0.0.1:1080 （这条即可）
+git config --global https.proxy https://127.0.0.1:1080
+
+socks5类型代理
+
+git config --global http.proxy ‘socks5://127.0.0.1:1080’ （这条即可）
+git config --global https.proxy ‘socks5://127.0.0.1:1080’
+
+
+查当前的代理配置
+
+git config --global --get http.proxy
+git config --global --get https.proxy
+
+取消设置代理
+
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+设置使用需账户密码验证的代理
+http类型代理
+git config --global http.proxy http://username:passwd@127.0.0.1:1080
+socks5类型代理
+git config --global http.proxy socks5://username:passwd@127.0.0.1:1080
