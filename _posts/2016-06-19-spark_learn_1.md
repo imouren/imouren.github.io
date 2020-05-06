@@ -74,7 +74,7 @@ def _get_mid_sim(pops, pairs):
     if mid_i in pops and mid_j in pops:
         sim = num / math.sqrt(pops[mid_i] * pops[mid_j])
         sim = round(sim, 8)
-        yield mid_i, (mid_j, sim) 
+        yield mid_i, (mid_j, sim)
         yield mid_j, (mid_i, sim)
 
 
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     pairs = lines.flatMap(_get_fudid_mid) \
                 .groupByKey() \
                 .flatMap(_get_mids_set)
-    
+
     # (mid_i, mid_j) n
     pairs_counts = pairs.flatMap(_get_mid_relate) \
                                 .reduceByKey(add)
@@ -208,4 +208,18 @@ log4jLogger = sc._jvm.org.apache.log4j
 LOGGER = log4jLogger.LogManager.getLogger(__name__)
 LOGGER.info("init log ...")
 
+```
+
+spark 执行hive提交时候发生错误
+
+java.lang.AssertionError: assertion failed: No plan for HiveTableRelation的解决方法
+
+创建SparkSession对象记得启用HiveContext, 即使用enableHiveSupport(), 如下
+
+```
+spark = SparkSession \
+        .builder \
+        .appName("test") \
+        .enableHiveSupport() \
+        .getOrCreate()
 ```

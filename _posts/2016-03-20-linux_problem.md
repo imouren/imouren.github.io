@@ -331,3 +331,27 @@ remote:  一个打对勾，目标机器不同那里；hostname:192.168.8.100; po
 ssh -gD 4444 -p5044 10.1.6.45
 
 浏览器：设置 本地 4444 端口代理即可
+
+
+## 批量修改编码
+
+#!/bin/bash
+### 将 values_here 替换为输入编码
+FROM_ENCODING="UTF8"
+### 输出编码 (UTF-8)
+TO_ENCODING="GB18030"
+### 转换命令
+CONVERT=" iconv  -f   $FROM_ENCODING  -t   $TO_ENCODING"
+### 使用循环转换多个文件
+for  file  in  *.csv; do
+$CONVERT   "$file"   -o  "${file%.csv}".gbk.csv
+done
+exit 0
+
+
+## 使用rz传输大文件失败解决
+
+使用：rz -be
+b：以二进制方式，默认为文本方式
+e：对所有控制字符转义
+有可能windows的文件带有一些特殊字符，编码方式不同，导致传输失败。所以使用rz -be 可以解决。

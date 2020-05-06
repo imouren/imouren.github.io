@@ -150,3 +150,11 @@ if __name__ == "__main__":
 
 ```
 
+分组TOPN
+
+```
+df = pd.DataFrame({'class':['a','a','b','b','a','a','b','c','c'],'score':[3,5,6,7,8,9,10,11,14]})
+
+df.sort_values(['class','score'],ascending=[1,0],inplace=True)
+grouped = df.groupby(['class']).head(2).reset_index(drop=True)
+```

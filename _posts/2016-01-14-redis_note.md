@@ -186,6 +186,8 @@ redis-cli KEYS "x*" | xargs redis-cli  DEL
 redis-cli keys "db:poseidon:media:*"|xargs -i redis-cli expire {} 86400
 或者
 redis-cli  DEL  `redis-cli KEYS "x*"`
+
+redis-cli --scan --pattern users:* | xargs redis-cli del
 {% endhighlight %}
 
 ### 获得键值的数据类型

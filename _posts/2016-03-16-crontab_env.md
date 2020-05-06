@@ -63,3 +63,11 @@ crontab -e
 MAILTO=""
 * * * * * /home/test/unison.sh >> /home/test/unison-run.log 2>&1
 ```
+
+
+查看没有被注释的crontab任务
+
+```python
+过滤空行 #或者;开头的
+crontab -l | grep -Ev "^$|^[#;]"
+```
