@@ -14,6 +14,8 @@ tags: spark
 
 去 http://spark.apache.org/downloads.html 下载相应版本的spark
 
+国内镜像 https://mirrors.tuna.tsinghua.edu.cn/apache/spark/
+
 ```python
 tar -xf spark-2.0.2-bin-hadoop2.4.tgz
 

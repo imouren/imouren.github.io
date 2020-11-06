@@ -224,6 +224,9 @@ x  -----删除忽略文件已经对git来说不识别的文件
 
 http类型代理
 
+git config --global http.proxy http://127.0.0.1:10001
+git config --global --unset http.proxy
+
 git config --global http.proxy http://127.0.0.1:1080 （这条即可）
 git config --global https.proxy https://127.0.0.1:1080
 
