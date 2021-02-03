@@ -214,3 +214,9 @@ print(df)
 """
 
 ```
+
+## 两列统计
+
+```
+df = df.groupby(['Col1', 'Col2']).size().reset_index(name='Freq')
+```
